@@ -41,8 +41,8 @@ model Company {
 }
 
 model UserGroups {
-  id   String @id @default(uuid())
-  name String
+  id    Int   @id @default(autoincrement())
+  group Group @default(COLLABORATOR)
 
   users User[]
 
@@ -52,7 +52,7 @@ model UserGroups {
 model User {
   id        String @id @default(uuid())
   companyId String @map("company_id")
-  groupId   String @map("group_id")
+  groupId   Int    @map("group_id")
   email     String @unique
   password  String
 
@@ -252,4 +252,10 @@ model ServiceOrderExpenses {
   projectServices ProjectExpenses @relation(fields: [projectExpenseId], references: [id])
 
   @@map("services_orders_expenses")
+}
+
+enum Group {
+  ADMIN
+  COLLABORATOR
+  CLIENT
 }
