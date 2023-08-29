@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module'
 import { AuthenticateUserController } from './controllers/authenticate.controller'
 import { CreateUserController } from './controllers/create-user.controller'
 import { CreateCollaboratorController } from './controllers/create-collaborator.controller'
+import { UpdateCollaboratorController } from './controllers/update-collaborator.controller'
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { CreateCollaboratorController } from './controllers/create-collaborator.
     AuthenticateUserController,
     CreateCollaboratorController,
     CreateUserController,
+    UpdateCollaboratorController,
   ],
   providers: [PrismaService],
 })
