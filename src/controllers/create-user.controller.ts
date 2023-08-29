@@ -2,7 +2,6 @@ import {
   Body,
   ConflictException,
   Controller,
-  HttpCode,
   Post,
   UseGuards,
 } from '@nestjs/common'
@@ -26,8 +25,7 @@ type CreateUserBodySchema = z.infer<typeof createUserBodySchema>
 export class CreateUserController {
   constructor(private prisma: PrismaService) {}
 
-  @Post()
-  @HttpCode(201)
+  @Post('/user')
   async handle(
     @CurrentUser() user: UserPayload,
     @Body() body: CreateUserBodySchema,

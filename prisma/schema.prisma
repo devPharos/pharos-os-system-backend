@@ -79,12 +79,12 @@ model File {
 }
 
 model Collaborator {
-  id           String @id @default(uuid())
-  companyId    String @map("company_id")
-  userId       String @unique @map("user_id")
+  id           String  @id @default(uuid())
+  companyId    String  @map("company_id")
+  userId       String? @unique @map("user_id")
   name         String
-  lastName     String @map("last_name")
-  cnpj         String @unique
+  lastName     String  @map("last_name")
+  cnpj         String  @unique
   phone        String
   country      String
   state        String
@@ -96,13 +96,13 @@ model Collaborator {
   cep          String
   bank         String
   agency       String
-  agencyDigit  String @map("agency_digit")
+  agencyDigit  String  @map("agency_digit")
   account      String
-  accountDigit String @map("account_digit")
-  pixKey       String @map("pix_key")
+  accountDigit String  @map("account_digit")
+  pixKey       String  @map("pix_key")
 
   company Company @relation(fields: [companyId], references: [id])
-  user    User    @relation(fields: [userId], references: [id])
+  user    User?   @relation(fields: [userId], references: [id])
 
   serviceOrders ServiceOrder[]
   projects      Project[]
