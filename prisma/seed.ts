@@ -1,18 +1,29 @@
 import { PrismaClient } from '@prisma/client'
+import { hash } from 'bcryptjs'
 const prisma = new PrismaClient()
 async function main() {
-  const groups = await prisma.userGroups.createMany({
-    data: [
-      {
-        group: 'ADMIN'
-      },
-      {
-        group: 'COLLABORATOR'
-      },
-      {
-        group: 'CLIENT'
-      }
-    ]
+  const hashedPassword = await hash('12345678', 8)
+
+  const group1 = await prisma.userGroups.upsert({
+    where: {id: 1},
+    update: {},
+    create: {
+      group: 'ADMIN'
+    }
+  })
+  const group2 = await prisma.userGroups.upsert({
+    where: { id: 2 },
+    update: {},
+    create: {
+      group: 'CLIENT'
+    }
+  })
+  const group3 = await prisma.userGroups.upsert({
+    where: { id: 3 },
+    update: {},
+    create: {
+      group: 'COLLABORATOR'
+    }
   })
   const pharos = await prisma.company.upsert({
     where: {cnpj: '123456788'},
@@ -31,10 +42,12 @@ async function main() {
       complement: 'complemento',
       cep: '12345-77',
     }})
-  const pharosUser = await prisma.user.create({
-    data: {
+  const pharosUser = await prisma.user.upsert({
+    where: { email: 'email@pharosit.com' },
+    update: {},
+    create: {
       email: 'email@pharosit.com',
-      password: '1234567',
+      password: hashedPassword,
       group: {
         connect: {id: 1}
       },
@@ -43,8 +56,10 @@ async function main() {
       }
     }
   })
-  const pharosCollaborator = await prisma.collaborator.create({
-    data: {
+  const pharosCollaborator = await prisma.collaborator.upsert({
+    where: { cnpj: '12349679878' },
+    update: {},
+    create: {
       name: 'Teste 1',
       lastName: 'Sobrenome 2',
       cnpj: '12349679878',
@@ -72,7 +87,9 @@ async function main() {
     }
   })
 
-  console.log(groups)
+  console.log(group1)
+  console.log(group2)
+  console.log(group3)
   console.log(pharos)
   console.log(pharosUser)
   console.log(pharosCollaborator)
