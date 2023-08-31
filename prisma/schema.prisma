@@ -168,12 +168,12 @@ model Project {
 }
 
 model ProjectExpenses {
-  id              String  @id @default(uuid())
-  companyId       String  @map("company_id")
-  projectId       String  @unique @map("project_id")
-  description     String
-  value           String
-  require_receipt Boolean @default(true)
+  id             String  @id @default(uuid())
+  companyId      String  @map("company_id")
+  projectId      String  @unique @map("project_id")
+  description    String
+  value          String
+  requireReceipt Boolean @default(true) @map("requireReceipt")
 
   company Company @relation(fields: [companyId], references: [id])
   project Project @relation(fields: [projectId], references: [id])
