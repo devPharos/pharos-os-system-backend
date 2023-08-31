@@ -9,6 +9,7 @@ import { hash } from 'bcryptjs'
 import { CurrentUser } from 'src/auth/current-user.decorator'
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
 import { UserPayload } from 'src/auth/jwt.strategy'
+import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { z } from 'zod'
 
@@ -27,8 +28,9 @@ export class CreateUserController {
 
   @Post('/user')
   async handle(
+    @Body(new ZodValidationPipe(createUserBodySchema))
+    body: CreateUserBodySchema,
     @CurrentUser() user: UserPayload,
-    @Body() body: CreateUserBodySchema,
   ) {
     const { email, password, role } = body
 

@@ -2,13 +2,13 @@ import {
   Body,
   ConflictException,
   Controller,
-  HttpCode,
   Post,
   UseGuards,
 } from '@nestjs/common'
 import { CurrentUser } from 'src/auth/current-user.decorator'
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
 import { UserPayload } from 'src/auth/jwt.strategy'
+import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { z } from 'zod'
 
@@ -40,10 +40,10 @@ type CreateCollaboratorBodySchema = z.infer<typeof createCollaboratorBodySchema>
 export class CreateCollaboratorController {
   constructor(private prisma: PrismaService) {}
   @Post('/collaborator')
-  @HttpCode(201)
   async handle(
+    @Body(new ZodValidationPipe(createCollaboratorBodySchema))
+    body: CreateCollaboratorBodySchema,
     @CurrentUser() user: UserPayload,
-    @Body() body: CreateCollaboratorBodySchema,
   ) {
     const {
       account,
