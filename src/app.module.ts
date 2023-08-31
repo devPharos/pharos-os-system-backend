@@ -7,6 +7,7 @@ import { AuthenticateUserController } from './controllers/authenticate.controlle
 import { CreateUserController } from './controllers/create-user.controller'
 import { CreateCollaboratorController } from './controllers/create-collaborator.controller'
 import { UpdateCollaboratorController } from './controllers/update-collaborator.controller'
+import { CreateProjectController } from './controllers/create-project.controller'
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { UpdateCollaboratorController } from './controllers/update-collaborator.
   controllers: [
     AuthenticateUserController,
     CreateCollaboratorController,
+    CreateProjectController,
     CreateUserController,
     UpdateCollaboratorController,
   ],
