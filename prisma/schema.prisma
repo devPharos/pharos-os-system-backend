@@ -242,14 +242,14 @@ model ServiceOrderExpenses {
   companyId        String @map("company_id")
   serviceOrderId   String @unique @map("service_order_id")
   projectId        String @map("project_id")
-  projectExpenseId String @map("project_service_id")
+  projectExpenseId String @map("project_expenses_id")
   fileHours        String @map("file_hours")
   value            String
 
   company         Company         @relation(fields: [companyId], references: [id])
   serviceOrder    ServiceOrder    @relation(fields: [serviceOrderId], references: [id])
   project         Project         @relation(fields: [projectId], references: [id])
-  projectServices ProjectExpenses @relation(fields: [projectExpenseId], references: [id])
+  projectExpenses ProjectExpenses @relation(fields: [projectExpenseId], references: [id])
 
   @@map("services_orders_expenses")
 }

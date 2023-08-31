@@ -31,7 +31,7 @@ export class CreateProjectExpensesController {
     await this.prisma.projectExpenses.create({
       data: {
         description,
-        require_receipt: requireReceipt,
+        requireReceipt,
         value,
         project: {
           connect: { id: projectId },
