@@ -15,6 +15,7 @@ import { CreateProjectServiceController } from './controllers/create/create-proj
 import { CreateServiceOrderDetailsController } from './controllers/create/create-service-order-details.controller'
 import { CreateServiceOrderExpensesController } from './controllers/create/create-service-order-expenses.controller'
 import { CreateServiceOrderController } from './controllers/create/create-service-order.controller'
+import { LogOutUserController } from './controllers/auth/logout.controller'
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { CreateServiceOrderController } from './controllers/create/create-servic
     CreateServiceOrderExpensesController,
     CreateServiceOrderController,
     CreateUserController,
+    LogOutUserController,
     UpdateCollaboratorController,
   ],
   providers: [PrismaService],
