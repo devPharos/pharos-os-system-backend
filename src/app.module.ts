@@ -18,6 +18,8 @@ import { CreateServiceOrderController } from "./controllers/create/create-servic
 import { LogOutUserController } from "./controllers/auth/logout.controller";
 import { ListClientsController } from "./controllers/list/list-client.controller";
 import { GetCurrentUserDataController } from "./controllers/get-user-data.controller";
+import { GetProjectsDataController } from "./controllers/get-projects-data.controller";
+import { GetProjectsServiceDataController } from "./controllers/get-project-expenses-data.controller";
 
 @Module({
   imports: [
@@ -40,6 +42,8 @@ import { GetCurrentUserDataController } from "./controllers/get-user-data.contro
     CreateServiceOrderController,
     CreateUserController,
     GetCurrentUserDataController,
+    GetProjectsDataController,
+    GetProjectsServiceDataController,
     ListClientsController,
     LogOutUserController,
     UpdateCollaboratorController,

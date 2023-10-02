@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -159,8 +156,8 @@ model Project {
   client       Client       @relation(fields: [clientId], references: [id])
   collaborator Collaborator @relation(fields: [coordinatorId], references: [id])
 
-  projectExpenses      ProjectExpenses?
-  projectServices      ProjectService?
+  projectsExpenses     ProjectExpenses[]
+  projectsServices     ProjectService[]
   serviceOrderDetails  ServiceOrderDetails[]
   serviceOrderExpenses ServiceOrderExpenses[]
 
@@ -170,7 +167,7 @@ model Project {
 model ProjectExpenses {
   id             String  @id @default(uuid())
   companyId      String  @map("company_id")
-  projectId      String  @unique @map("project_id")
+  projectId      String  @map("project_id")
   description    String
   value          String
   requireReceipt Boolean @default(true) @map("requireReceipt")
@@ -186,7 +183,7 @@ model ProjectExpenses {
 model ProjectService {
   id               String  @id @default(uuid())
   companyId        String  @map("company_id")
-  projectId        String  @unique @map("project_id")
+  projectId        String  @map("project_id")
   description      String
   chargesClient    Boolean @default(true) @map("charges_client")
   passCollaborator Boolean @default(true) @map("pass_collaborator")
