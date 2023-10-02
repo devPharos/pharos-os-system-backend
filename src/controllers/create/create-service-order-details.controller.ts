@@ -5,11 +5,11 @@ import {
   NotAcceptableException,
   Post,
   UseGuards,
-} from '@nestjs/common'
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
-import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe'
-import { PrismaService } from 'src/prisma/prisma.service'
-import { z } from 'zod'
+} from "@nestjs/common";
+import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
+import { ZodValidationPipe } from "src/pipes/zod-validation.pipe";
+import { PrismaService } from "src/prisma/prisma.service";
+import { z } from "zod";
 
 const createServiceOrderDetailsBodySchema = z.object({
   companyId: z.string().uuid(),
@@ -19,17 +19,17 @@ const createServiceOrderDetailsBodySchema = z.object({
   description: z.string(),
   startDate: z.coerce.date(),
   endDate: z.coerce.date(),
-})
+});
 
 type CreateServiceOrderDetailsBodySchema = z.infer<
   typeof createServiceOrderDetailsBodySchema
->
+>;
 
-@Controller('/service-orders')
+@Controller("/service-orders")
 @UseGuards(JwtAuthGuard)
 export class CreateServiceOrderDetailsController {
   constructor(private prisma: PrismaService) {}
-  @Post('/details')
+  @Post("/details")
   @HttpCode(201)
   async handle(
     @Body(new ZodValidationPipe(createServiceOrderDetailsBodySchema))
@@ -43,12 +43,12 @@ export class CreateServiceOrderDetailsController {
       projectServiceId,
       serviceOrderId,
       startDate,
-    } = body
+    } = body;
 
     if (startDate < endDate) {
       throw new NotAcceptableException(
-        'Start date cannot be earlier than end date',
-      )
+        "Start date cannot be earlier than end date",
+      );
     }
 
     await this.prisma.serviceOrderDetails.create({
@@ -69,6 +69,6 @@ export class CreateServiceOrderDetailsController {
           connect: { id: serviceOrderId },
         },
       },
-    })
+    });
   }
 }

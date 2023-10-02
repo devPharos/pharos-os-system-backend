@@ -5,11 +5,11 @@ import {
   NotAcceptableException,
   Post,
   UseGuards,
-} from '@nestjs/common'
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
-import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe'
-import { PrismaService } from 'src/prisma/prisma.service'
-import { z } from 'zod'
+} from "@nestjs/common";
+import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
+import { ZodValidationPipe } from "src/pipes/zod-validation.pipe";
+import { PrismaService } from "src/prisma/prisma.service";
+import { z } from "zod";
 
 const createServiceOrderBodySchema = z.object({
   companyId: z.string().uuid(),
@@ -19,11 +19,13 @@ const createServiceOrderBodySchema = z.object({
   startDate: z.coerce.date(),
   endDate: z.coerce.date(),
   totalHours: z.string(),
-})
+});
 
-type CreateServiceOrderBodySchema = z.infer<typeof createServiceOrderBodySchema>
+type CreateServiceOrderBodySchema = z.infer<
+  typeof createServiceOrderBodySchema
+>;
 
-@Controller('/service-orders')
+@Controller("/service-orders")
 @UseGuards(JwtAuthGuard)
 export class CreateServiceOrderController {
   constructor(private prisma: PrismaService) {}
@@ -41,12 +43,12 @@ export class CreateServiceOrderController {
       endDate,
       startDate,
       totalHours,
-    } = body
+    } = body;
 
     if (startDate < endDate) {
       throw new NotAcceptableException(
-        'Start date cannot be earlier than end date',
-      )
+        "Start date cannot be earlier than end date",
+      );
     }
 
     await this.prisma.serviceOrder.create({
@@ -65,6 +67,6 @@ export class CreateServiceOrderController {
           connect: { id: companyId },
         },
       },
-    })
+    });
   }
 }

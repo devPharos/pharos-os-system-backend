@@ -1,8 +1,8 @@
-import { Body, Controller, HttpCode, Post, UseGuards } from '@nestjs/common'
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
-import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe'
-import { PrismaService } from 'src/prisma/prisma.service'
-import { z } from 'zod'
+import { Body, Controller, HttpCode, Post, UseGuards } from "@nestjs/common";
+import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
+import { ZodValidationPipe } from "src/pipes/zod-validation.pipe";
+import { PrismaService } from "src/prisma/prisma.service";
+import { z } from "zod";
 
 const createProjectServiceBodySchema = z.object({
   companyId: z.string().uuid(),
@@ -10,17 +10,17 @@ const createProjectServiceBodySchema = z.object({
   description: z.string(),
   chargesClient: z.boolean(),
   passCollaborator: z.boolean(),
-})
+});
 
 type CreateProjectServiceBodySchema = z.infer<
   typeof createProjectServiceBodySchema
->
+>;
 
-@Controller('/projects')
+@Controller("/projects")
 @UseGuards(JwtAuthGuard)
 export class CreateProjectServiceController {
   constructor(private prisma: PrismaService) {}
-  @Post('/service')
+  @Post("/service")
   @HttpCode(201)
   async handle(
     @Body(new ZodValidationPipe(createProjectServiceBodySchema))
@@ -32,7 +32,7 @@ export class CreateProjectServiceController {
       description,
       passCollaborator,
       projectId,
-    } = body
+    } = body;
 
     await this.prisma.projectService.create({
       data: {
@@ -46,6 +46,6 @@ export class CreateProjectServiceController {
           connect: { id: projectId },
         },
       },
-    })
+    });
   }
 }

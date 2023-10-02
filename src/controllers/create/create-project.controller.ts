@@ -5,11 +5,11 @@ import {
   NotAcceptableException,
   Post,
   UseGuards,
-} from '@nestjs/common'
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
-import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe'
-import { PrismaService } from 'src/prisma/prisma.service'
-import { z } from 'zod'
+} from "@nestjs/common";
+import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
+import { ZodValidationPipe } from "src/pipes/zod-validation.pipe";
+import { PrismaService } from "src/prisma/prisma.service";
+import { z } from "zod";
 
 const createProjectBodySchema = z.object({
   companyId: z.string().uuid(),
@@ -22,11 +22,11 @@ const createProjectBodySchema = z.object({
   hoursForecast: z.string(),
   hoursBalance: z.string(),
   hourValue: z.string(),
-})
+});
 
-type CreateProjectBodySchema = z.infer<typeof createProjectBodySchema>
+type CreateProjectBodySchema = z.infer<typeof createProjectBodySchema>;
 
-@Controller('/projects')
+@Controller("/projects")
 @UseGuards(JwtAuthGuard)
 export class CreateProjectController {
   constructor(private prisma: PrismaService) {}
@@ -47,12 +47,12 @@ export class CreateProjectController {
       hoursForecast,
       name,
       startDate,
-    } = body
+    } = body;
 
     if (startDate < endDate) {
       throw new NotAcceptableException(
-        'Start date cannot be earlier than end date',
-      )
+        "Start date cannot be earlier than end date",
+      );
     }
 
     await this.prisma.project.create({
@@ -74,6 +74,6 @@ export class CreateProjectController {
           connect: { id: coordinatorId },
         },
       },
-    })
+    });
   }
 }

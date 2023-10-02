@@ -1,8 +1,8 @@
-import { Body, Controller, HttpCode, Post, UseGuards } from '@nestjs/common'
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
-import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe'
-import { PrismaService } from 'src/prisma/prisma.service'
-import { z } from 'zod'
+import { Body, Controller, HttpCode, Post, UseGuards } from "@nestjs/common";
+import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
+import { ZodValidationPipe } from "src/pipes/zod-validation.pipe";
+import { PrismaService } from "src/prisma/prisma.service";
+import { z } from "zod";
 
 const createFileBodySchema = z.object({
   companyId: z.string().uuid(),
@@ -10,11 +10,11 @@ const createFileBodySchema = z.object({
   size: z.string(),
   key: z.string(),
   url: z.string(),
-})
+});
 
-type CreateFileBodySchema = z.infer<typeof createFileBodySchema>
+type CreateFileBodySchema = z.infer<typeof createFileBodySchema>;
 
-@Controller('/files')
+@Controller("/files")
 @UseGuards(JwtAuthGuard)
 export class CreateFileController {
   constructor(private prisma: PrismaService) {}
@@ -24,7 +24,7 @@ export class CreateFileController {
     @Body(new ZodValidationPipe(createFileBodySchema))
     body: CreateFileBodySchema,
   ) {
-    const { companyId, key, name, size, url } = body
+    const { companyId, key, name, size, url } = body;
 
     await this.prisma.file.create({
       data: {
@@ -36,6 +36,6 @@ export class CreateFileController {
           connect: { id: companyId },
         },
       },
-    })
+    });
   }
 }

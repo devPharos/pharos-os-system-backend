@@ -5,12 +5,12 @@ import {
   HttpCode,
   Post,
   UseGuards,
-} from '@nestjs/common'
-import { CurrentUser } from 'src/auth/current-user.decorator'
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
-import { UserPayload } from 'src/auth/jwt.strategy'
-import { PrismaService } from 'src/prisma/prisma.service'
-import { z } from 'zod'
+} from "@nestjs/common";
+import { CurrentUser } from "src/auth/current-user.decorator";
+import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
+import { UserPayload } from "src/auth/jwt.strategy";
+import { PrismaService } from "src/prisma/prisma.service";
+import { z } from "zod";
 
 const createClientBodySchema = z.object({
   businessName: z.string(),
@@ -31,15 +31,15 @@ const createClientBodySchema = z.object({
   account: z.string(),
   accountDigit: z.string().max(1),
   pixKey: z.string(),
-})
+});
 
-type CreateClientBodySchema = z.infer<typeof createClientBodySchema>
+type CreateClientBodySchema = z.infer<typeof createClientBodySchema>;
 
-@Controller('/accounts')
+@Controller("/accounts")
 @UseGuards(JwtAuthGuard)
 export class CreateClientController {
   constructor(private prisma: PrismaService) {}
-  @Post('/client')
+  @Post("/client")
   @HttpCode(201)
   async handle(
     @CurrentUser() user: UserPayload,
@@ -64,25 +64,25 @@ export class CreateClientController {
       phone,
       pixKey,
       state,
-    } = body
+    } = body;
 
     const clientWithSameCnpj = await this.prisma.client.findUnique({
       where: { cnpj },
-    })
+    });
 
     if (clientWithSameCnpj) {
-      throw new ConflictException('Client with same cnpj already exists')
+      throw new ConflictException("Client with same cnpj already exists");
     }
 
     const currentUser = await this.prisma.user.findUnique({
       where: { id: user.sub },
-    })
+    });
 
     const currentCompany = await this.prisma.company.findUnique({
       where: {
         id: currentUser?.companyId,
       },
-    })
+    });
 
     await this.prisma.client.create({
       data: {
@@ -108,6 +108,6 @@ export class CreateClientController {
           connect: { id: currentCompany?.id },
         },
       },
-    })
+    });
   }
 }

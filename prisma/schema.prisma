@@ -203,6 +203,7 @@ model ServiceOrder {
   id             String   @id @default(uuid())
   companyId      String   @map("company_id")
   collaboratorId String   @map("collaborator_id")
+  remote         Boolean? @default(false)
   clientId       String   @map("client_id")
   date           DateTime @default(now())
   startDate      DateTime @map("start_date")
