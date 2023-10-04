@@ -9,7 +9,7 @@ const createServiceOrderExpensesBodySchema = z.object({
   serviceOrderId: z.string().uuid(),
   projectId: z.string().uuid(),
   projectExpenseId: z.string().uuid(),
-  fileHours: z.string(),
+  fileId: z.string().uuid(),
   value: z.string(),
 });
 
@@ -29,7 +29,7 @@ export class CreateServiceOrderExpensesController {
   ) {
     const {
       companyId,
-      fileHours,
+      fileId,
       projectExpenseId,
       projectId,
       serviceOrderId,
@@ -38,8 +38,10 @@ export class CreateServiceOrderExpensesController {
 
     await this.prisma.serviceOrderExpenses.create({
       data: {
-        fileHours,
         value,
+        file: {
+          connect: { id: fileId },
+        },
         company: {
           connect: { id: companyId },
         },

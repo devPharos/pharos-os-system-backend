@@ -19,7 +19,8 @@ import { LogOutUserController } from "./controllers/auth/logout.controller";
 import { ListClientsController } from "./controllers/list/list-client.controller";
 import { GetCurrentUserDataController } from "./controllers/get-user-data.controller";
 import { GetProjectsDataController } from "./controllers/get-projects-data.controller";
-import { GetProjectsServiceDataController } from "./controllers/get-project-expenses-data.controller";
+import { GetProjectServicesController } from "./controllers/get-project-services.controller";
+import { GetProjectExpensesController } from "./controllers/get-project-expenses-data.controller";
 
 @Module({
   imports: [
@@ -43,7 +44,8 @@ import { GetProjectsServiceDataController } from "./controllers/get-project-expe
     CreateUserController,
     GetCurrentUserDataController,
     GetProjectsDataController,
-    GetProjectsServiceDataController,
+    GetProjectExpensesController,
+    GetProjectServicesController,
     ListClientsController,
     LogOutUserController,
     UpdateCollaboratorController,

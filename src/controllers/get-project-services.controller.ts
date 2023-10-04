@@ -11,20 +11,20 @@ type GetProjectsBodySchema = z.infer<typeof getProjectsBodySchema>;
 
 @Controller()
 @UseGuards(JwtAuthGuard)
-export class GetProjectExpensesController {
+export class GetProjectServicesController {
   constructor(private prisma: PrismaService) {}
-  @Get("/project-expenses")
+  @Get("/project-services")
   @HttpCode(201)
   async handle(@Body() body: GetProjectsBodySchema) {
     const { projectId } = body;
-    const projectExpenses = await this.prisma.projectExpenses.findMany({
+    const projectsServices = await this.prisma.projectService.findMany({
       where: {
         projectId,
       },
     });
 
     return {
-      projectExpenses,
+      projectsServices,
     };
   }
 }

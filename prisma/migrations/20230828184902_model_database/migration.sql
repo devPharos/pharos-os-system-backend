@@ -94,7 +94,6 @@ CREATE TABLE `projects_expenses` (
     `value` VARCHAR(191) NOT NULL,
     `require_receipt` BOOLEAN NOT NULL DEFAULT true,
 
-    UNIQUE INDEX `projects_expenses_project_id_key`(`project_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -107,7 +106,6 @@ CREATE TABLE `projects_services` (
     `charges_client` BOOLEAN NOT NULL DEFAULT true,
     `pass_collaborator` BOOLEAN NOT NULL DEFAULT true,
 
-    UNIQUE INDEX `projects_services_project_id_key`(`project_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
