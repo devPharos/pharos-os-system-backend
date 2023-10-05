@@ -134,7 +134,6 @@ CREATE TABLE `services_orders_details` (
     `start_date` DATETIME(3) NOT NULL,
     `end_date` DATETIME(3) NOT NULL,
 
-    UNIQUE INDEX `services_orders_details_service_order_id_key`(`service_order_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -148,7 +147,6 @@ CREATE TABLE `services_orders_expenses` (
     `file_hours` VARCHAR(191) NOT NULL,
     `value` VARCHAR(191) NOT NULL,
 
-    UNIQUE INDEX `services_orders_expenses_service_order_id_key`(`service_order_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

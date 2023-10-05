@@ -207,13 +207,14 @@ model ServiceOrder {
   startDate      DateTime @map("start_date")
   endDate        DateTime @map("end_date")
   totalHours     String   @map("total_hours")
+  status         OsStatus @default(Aberto)
 
   company      Company      @relation(fields: [companyId], references: [id])
   collaborator Collaborator @relation(fields: [collaboratorId], references: [id])
   client       Client       @relation(fields: [clientId], references: [id])
 
-  serviceOrderDetails  ServiceOrderDetails?
-  serviceOrderExpenses ServiceOrderExpenses?
+  serviceOrderDetails  ServiceOrderDetails[]
+  serviceOrderExpenses ServiceOrderExpenses[]
 
   @@map("services_orders")
 }
@@ -221,7 +222,7 @@ model ServiceOrder {
 model ServiceOrderDetails {
   id               String   @id @default(uuid())
   companyId        String   @map("company_id")
-  serviceOrderId   String   @unique @map("service_order_id")
+  serviceOrderId   String   @map("service_order_id")
   projectId        String   @map("project_id")
   projectServiceId String   @map("project_service_id")
   description      String
@@ -237,19 +238,19 @@ model ServiceOrderDetails {
 }
 
 model ServiceOrderExpenses {
-  id               String @id @default(uuid())
-  companyId        String @map("company_id")
-  serviceOrderId   String @unique @map("service_order_id")
-  projectId        String @map("project_id")
-  projectExpenseId String @map("project_expenses_id")
-  fileId           String @map("file_id")
+  id               String  @id @default(uuid())
+  companyId        String  @map("company_id")
+  serviceOrderId   String  @map("service_order_id")
+  projectId        String  @map("project_id")
+  projectExpenseId String  @map("project_expenses_id")
+  fileId           String? @map("file_id")
   value            String
 
   company         Company         @relation(fields: [companyId], references: [id])
   serviceOrder    ServiceOrder    @relation(fields: [serviceOrderId], references: [id])
   project         Project         @relation(fields: [projectId], references: [id])
   projectExpenses ProjectExpenses @relation(fields: [projectExpenseId], references: [id])
-  file            File            @relation(fields: [fileId], references: [id])
+  file            File?           @relation(fields: [fileId], references: [id])
 
   @@map("services_orders_expenses")
 }
@@ -258,4 +259,11 @@ enum Group {
   ADMIN
   COLLABORATOR
   CLIENT
+}
+
+enum OsStatus {
+  Aberto
+  Enviado
+  Faturado
+  Cancelado
 }

@@ -21,6 +21,7 @@ import { GetCurrentUserDataController } from "./controllers/get-user-data.contro
 import { GetProjectsDataController } from "./controllers/get-projects-data.controller";
 import { GetProjectServicesController } from "./controllers/get-project-services.controller";
 import { GetProjectExpensesController } from "./controllers/get-project-expenses-data.controller";
+import { ListServiceOrdersController } from "./controllers/list/list-service-orders.controller";
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { GetProjectExpensesController } from "./controllers/get-project-expenses
     GetProjectExpensesController,
     GetProjectServicesController,
     ListClientsController,
+    ListServiceOrdersController,
     LogOutUserController,
     UpdateCollaboratorController,
   ],
