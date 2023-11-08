@@ -4,13 +4,13 @@ import { PrismaService } from "src/prisma/prisma.service";
 
 @Controller()
 @UseGuards(JwtAuthGuard)
-export class ListServiceOrdersController {
+export class ListCompaniesController {
   constructor(private prisma: PrismaService) {}
-  @Get("/service-orders")
+  @Get("/companies")
   @HttpCode(201)
   async handle() {
-    const serviceOrders = await this.prisma.serviceOrder.findMany();
+    const companies = await this.prisma.company.findMany();
 
-    return serviceOrders;
+    return companies;
   }
 }

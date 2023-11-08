@@ -22,6 +22,11 @@ import { GetProjectsDataController } from "./controllers/get-projects-data.contr
 import { GetProjectServicesController } from "./controllers/get-project-services.controller";
 import { GetProjectExpensesController } from "./controllers/get-project-expenses-data.controller";
 import { ListServiceOrdersController } from "./controllers/list/list-service-orders.controller";
+import { GetServiceOrderDataController } from "./controllers/get-service-order.controller";
+import { ListCompaniesController } from "./controllers/list/list-companies.controller";
+import { GetClientDataController } from "./controllers/get-client.controller";
+import { EditProfileController } from "./controllers/edit-profile.controller";
+import { GetCollaboratorProfileController } from "./controllers/get-collaborator.controller";
 
 @Module({
   imports: [
@@ -42,12 +47,17 @@ import { ListServiceOrdersController } from "./controllers/list/list-service-ord
     CreateServiceOrderDetailsController,
     CreateServiceOrderExpensesController,
     CreateServiceOrderController,
+    EditProfileController,
+    GetServiceOrderDataController,
+    GetClientDataController,
+    GetCollaboratorProfileController,
     CreateUserController,
     GetCurrentUserDataController,
     GetProjectsDataController,
     GetProjectExpensesController,
     GetProjectServicesController,
     ListClientsController,
+    ListCompaniesController,
     ListServiceOrdersController,
     LogOutUserController,
     UpdateCollaboratorController,

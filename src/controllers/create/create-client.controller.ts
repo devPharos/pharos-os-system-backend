@@ -1,11 +1,4 @@
-import {
-  Body,
-  ConflictException,
-  Controller,
-  HttpCode,
-  Post,
-  UseGuards,
-} from "@nestjs/common";
+import { Body, Controller, HttpCode, Post, UseGuards } from "@nestjs/common";
 import { CurrentUser } from "src/auth/current-user.decorator";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { UserPayload } from "src/auth/jwt.strategy";
@@ -66,14 +59,6 @@ export class CreateClientController {
       state,
     } = body;
 
-    const clientWithSameCnpj = await this.prisma.client.findUnique({
-      where: { cnpj },
-    });
-
-    if (clientWithSameCnpj) {
-      throw new ConflictException("Client with same cnpj already exists");
-    }
-
     const currentUser = await this.prisma.user.findUnique({
       where: { id: user.sub },
     });
@@ -84,8 +69,32 @@ export class CreateClientController {
       },
     });
 
-    await this.prisma.client.create({
-      data: {
+    await this.prisma.client.upsert({
+      where: { cnpj },
+      create: {
+        account,
+        accountDigit,
+        address,
+        agency,
+        agencyDigit,
+        bank,
+        businessName,
+        cep,
+        city,
+        cnpj,
+        complement,
+        country,
+        fantasyName,
+        neighborhood,
+        number,
+        phone,
+        pixKey,
+        state,
+        company: {
+          connect: { id: currentCompany?.id },
+        },
+      },
+      update: {
         account,
         accountDigit,
         address,

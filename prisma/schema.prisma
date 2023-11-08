@@ -8,250 +8,256 @@ datasource db {
 }
 
 model Company {
-  id           String  @id @default(uuid())
-  name         String
-  cnpj         String  @unique
-  active       Boolean @default(true)
-  email        String
-  phone        String
-  country      String
-  state        String
-  city         String
-  neighborhood String
-  address      String
-  number       String
-  complement   String
-  cep          String
-
-  users                User[]
-  files                File[]
-  collaborators        Collaborator[]
+  id                   String                 @id @default(uuid())
+  name                 String
+  cnpj                 String                 @unique
+  active               Boolean                @default(true)
+  email                String
+  phone                String
+  country              String
+  state                String
+  city                 String
+  neighborhood         String
+  address              String
+  number               String
+  complement           String
+  cep                  String
   clients              Client[]
+  collaborators        Collaborator[]
+  files                File[]
   projects             Project[]
   projectExpenses      ProjectExpenses[]
   projectServices      ProjectService[]
   serviceOrder         ServiceOrder[]
   serviceOrderDetails  ServiceOrderDetails[]
   serviceOrderExpenses ServiceOrderExpenses[]
+  users                User[]
 
   @@map("companies")
 }
 
 model UserGroups {
-  id    Int   @id @default(autoincrement())
-  group Group @default(COLLABORATOR)
-
+  id    Int    @id @default(autoincrement())
+  group Group  @default(COLLABORATOR)
   users User[]
 
   @@map("user_groups")
 }
 
 model User {
-  id        String @id @default(uuid())
-  companyId String @map("company_id")
-  groupId   Int    @map("group_id")
-  email     String @unique
-  password  String
-
-  group   UserGroups @relation(fields: [groupId], references: [id])
-  company Company    @relation(fields: [companyId], references: [id])
-
-  collaborator Collaborator?
+  id           String        @id @default(uuid())
+  companyId    String        @map("company_id")
+  groupId      Int           @map("group_id")
+  email        String        @unique
+  password     String
   client       Client?
+  collaborator Collaborator?
+  company      Company       @relation(fields: [companyId], references: [id])
+  group        UserGroups    @relation(fields: [groupId], references: [id])
 
+  @@index([companyId], map: "users_company_id_fkey")
+  @@index([groupId], map: "users_group_id_fkey")
   @@map("users")
 }
 
 model File {
-  id        String @id @default(uuid())
-  companyId String @map("company_id")
-  name      String
-  size      String
-  key       String
-  url       String
-
+  id                   String                 @id @default(uuid())
+  companyId            String                 @map("company_id")
+  name                 String
+  size                 String
+  key                  String
+  url                  String
   company              Company                @relation(fields: [companyId], references: [id])
   ServiceOrderExpenses ServiceOrderExpenses[]
 
+  @@index([companyId], map: "files_company_id_fkey")
   @@map("files")
 }
 
 model Collaborator {
-  id           String  @id @default(uuid())
-  companyId    String  @map("company_id")
-  userId       String? @unique @map("user_id")
-  name         String
-  lastName     String  @map("last_name")
-  cnpj         String  @unique
-  phone        String
-  country      String
-  state        String
-  city         String
-  neighborhood String
-  address      String
-  number       String
-  complement   String
-  cep          String
-  bank         String
-  agency       String
-  agencyDigit  String  @map("agency_digit")
-  account      String
-  accountDigit String  @map("account_digit")
-  pixKey       String  @map("pix_key")
-
-  company Company @relation(fields: [companyId], references: [id])
-  user    User?   @relation(fields: [userId], references: [id])
-
-  serviceOrders ServiceOrder[]
+  id            String         @id @default(uuid())
+  companyId     String         @map("company_id")
+  userId        String?        @unique @map("user_id")
+  name          String
+  lastName      String         @map("last_name")
+  cnpj          String         @unique
+  phone         String
+  country       String
+  state         String
+  city          String
+  neighborhood  String
+  address       String
+  number        String
+  complement    String
+  cep           String
+  bank          String
+  agency        String
+  agencyDigit   String         @map("agency_digit")
+  account       String
+  accountDigit  String         @map("account_digit")
+  pixKey        String         @map("pix_key")
+  company       Company        @relation(fields: [companyId], references: [id])
+  user          User?          @relation(fields: [userId], references: [id])
   projects      Project[]
+  serviceOrders ServiceOrder[]
 
+  @@index([companyId], map: "collaborators_company_id_fkey")
   @@map("collaborators")
 }
 
 model Client {
-  id           String  @id @default(uuid())
-  companyId    String  @map("company_id")
-  userId       String? @unique @map("user_id")
-  businessName String  @map("business_id")
-  fantasyName  String  @map("fantasy_id")
-  cnpj         String  @unique
-  phone        String
-  country      String
-  state        String
-  city         String
-  neighborhood String
-  address      String
-  number       String
-  complement   String
-  cep          String
-  bank         String
-  agency       String
-  agencyDigit  String  @map("agency_digit")
-  account      String
-  accountDigit String  @map("account_digit")
-  pixKey       String  @map("pix_key")
-
-  company Company @relation(fields: [companyId], references: [id])
-  user    User?   @relation(fields: [userId], references: [id])
-
+  id             String         @id @default(uuid())
+  companyId      String         @map("company_id")
+  userId         String?        @unique @map("user_id")
+  businessName   String         @map("business_id")
+  fantasyName    String         @map("fantasy_id")
+  cnpj           String         @unique
+  phone          String
+  country        String
+  state          String
+  city           String
+  neighborhood   String
+  address        String
+  number         String
+  complement     String
+  cep            String
+  bank           String
+  agency         String
+  agencyDigit    String         @map("agency_digit")
+  account        String
+  accountDigit   String         @map("account_digit")
+  pixKey         String         @map("pix_key")
+  active         Boolean?       @default(true)
+  company        Company        @relation(fields: [companyId], references: [id])
+  user           User?          @relation(fields: [userId], references: [id])
   projects       Project[]
   servicesOrders ServiceOrder[]
 
+  @@index([companyId], map: "clients_company_id_fkey")
   @@map("clients")
 }
 
 model Project {
-  id               String   @id @default(uuid())
-  companyId        String   @map("company_id")
-  clientId         String   @map("client_id")
-  coordinatorId    String   @map("coordinator_id")
-  name             String
-  startDate        DateTime @map("start_date")
-  endDate          DateTime @map("end_date")
-  deliveryForecast DateTime @map("delivery_forecast")
-  hoursForecast    String   @map("hours_forecast")
-  hoursBalance     String   @map("hours_balance")
-  hourValue        String   @map("hour_value")
-
-  company      Company      @relation(fields: [companyId], references: [id])
-  client       Client       @relation(fields: [clientId], references: [id])
-  collaborator Collaborator @relation(fields: [coordinatorId], references: [id])
-
+  id                   String                 @id @default(uuid())
+  companyId            String                 @map("company_id")
+  clientId             String                 @map("client_id")
+  coordinatorId        String                 @map("coordinator_id")
+  name                 String
+  startDate            DateTime               @map("start_date")
+  endDate              DateTime               @map("end_date")
+  deliveryForecast     DateTime               @map("delivery_forecast")
+  hoursForecast        String                 @map("hours_forecast")
+  hoursBalance         String                 @map("hours_balance")
+  hourValue            String                 @map("hour_value")
+  client               Client                 @relation(fields: [clientId], references: [id])
+  company              Company                @relation(fields: [companyId], references: [id])
+  collaborator         Collaborator           @relation(fields: [coordinatorId], references: [id])
   projectsExpenses     ProjectExpenses[]
   projectsServices     ProjectService[]
   serviceOrderDetails  ServiceOrderDetails[]
   serviceOrderExpenses ServiceOrderExpenses[]
 
+  @@index([clientId], map: "projects_client_id_fkey")
+  @@index([companyId], map: "projects_company_id_fkey")
+  @@index([coordinatorId], map: "projects_coordinator_id_fkey")
   @@map("projects")
 }
 
 model ProjectExpenses {
-  id             String  @id @default(uuid())
-  companyId      String  @map("company_id")
-  projectId      String  @map("project_id")
-  description    String
-  value          String
-  requireReceipt Boolean @default(true) @map("requireReceipt")
-
-  company Company @relation(fields: [companyId], references: [id])
-  project Project @relation(fields: [projectId], references: [id])
-
+  id                   String                 @id @default(uuid())
+  companyId            String                 @map("company_id")
+  projectId            String                 @map("project_id")
+  description          String
+  value                String
+  requireReceipt       Boolean                @default(true) @map("requireReceipt")
+  company              Company                @relation(fields: [companyId], references: [id])
+  project              Project                @relation(fields: [projectId], references: [id])
   ServiceOrderExpenses ServiceOrderExpenses[]
 
+  @@index([companyId], map: "projects_expenses_company_id_fkey")
+  @@index([projectId], map: "projects_expenses_project_id_fkey")
   @@map("projects_expenses")
 }
 
 model ProjectService {
-  id               String  @id @default(uuid())
-  companyId        String  @map("company_id")
-  projectId        String  @map("project_id")
-  description      String
-  chargesClient    Boolean @default(true) @map("charges_client")
-  passCollaborator Boolean @default(true) @map("pass_collaborator")
-
-  company Company @relation(fields: [companyId], references: [id])
-  project Project @relation(fields: [projectId], references: [id])
-
+  id                  String                @id @default(uuid())
+  companyId           String                @map("company_id")
+  projectId           String                @map("project_id")
+  description         String
+  chargesClient       Boolean               @default(true) @map("charges_client")
+  passCollaborator    Boolean               @default(true) @map("pass_collaborator")
+  company             Company               @relation(fields: [companyId], references: [id])
+  project             Project               @relation(fields: [projectId], references: [id])
   serviceOrderDetails ServiceOrderDetails[]
 
+  @@index([companyId], map: "projects_services_company_id_fkey")
+  @@index([projectId], map: "projects_services_project_id_fkey")
   @@map("projects_services")
 }
 
 model ServiceOrder {
-  id             String   @id @default(uuid())
-  companyId      String   @map("company_id")
-  collaboratorId String   @map("collaborator_id")
-  remote         Boolean? @default(false)
-  clientId       String   @map("client_id")
-  date           DateTime @default(now())
-  startDate      DateTime @map("start_date")
-  endDate        DateTime @map("end_date")
-  totalHours     String   @map("total_hours")
-  status         OsStatus @default(Aberto)
-
-  company      Company      @relation(fields: [companyId], references: [id])
-  collaborator Collaborator @relation(fields: [collaboratorId], references: [id])
-  client       Client       @relation(fields: [clientId], references: [id])
-
+  id                   String                 @id @default(uuid())
+  companyId            String                 @map("company_id")
+  collaboratorId       String                 @map("collaborator_id")
+  clientId             String                 @map("client_id")
+  date                 DateTime               @default(now())
+  startDate            DateTime               @map("start_date")
+  endDate              DateTime               @map("end_date")
+  totalHours           String                 @map("total_hours")
+  remote               Boolean?               @default(false)
+  status               OsStatus               @default(Aberto)
+  client               Client                 @relation(fields: [clientId], references: [id])
+  collaborator         Collaborator           @relation(fields: [collaboratorId], references: [id])
+  company              Company                @relation(fields: [companyId], references: [id])
   serviceOrderDetails  ServiceOrderDetails[]
   serviceOrderExpenses ServiceOrderExpenses[]
 
+  @@index([clientId], map: "services_orders_client_id_fkey")
+  @@index([collaboratorId], map: "services_orders_collaborator_id_fkey")
+  @@index([companyId], map: "services_orders_company_id_fkey")
   @@map("services_orders")
 }
 
 model ServiceOrderDetails {
-  id               String   @id @default(uuid())
-  companyId        String   @map("company_id")
-  serviceOrderId   String   @map("service_order_id")
-  projectId        String   @map("project_id")
-  projectServiceId String   @map("project_service_id")
-  description      String
-  startDate        DateTime @map("start_date")
-  endDate          DateTime @map("end_date")
+  id               String         @id @default(uuid())
+  companyId        String         @map("company_id")
+  serviceOrderId   String         @map("service_order_id")
+  projectId        String         @map("project_id")
+  projectServiceId String         @map("project_service_id")
+  description      String         @db.LongText
+  startDate        DateTime       @map("start_date")
+  endDate          DateTime       @map("end_date")
+  company          Company        @relation(fields: [companyId], references: [id])
+  project          Project        @relation(fields: [projectId], references: [id])
+  projectServices  ProjectService @relation(fields: [projectServiceId], references: [id])
+  serviceOrder     ServiceOrder   @relation(fields: [serviceOrderId], references: [id])
 
-  company         Company        @relation(fields: [companyId], references: [id])
-  serviceOrder    ServiceOrder   @relation(fields: [serviceOrderId], references: [id])
-  project         Project        @relation(fields: [projectId], references: [id])
-  projectServices ProjectService @relation(fields: [projectServiceId], references: [id])
-
+  @@index([companyId], map: "services_orders_details_company_id_fkey")
+  @@index([projectId], map: "services_orders_details_project_id_fkey")
+  @@index([projectServiceId], map: "services_orders_details_project_service_id_fkey")
+  @@index([serviceOrderId], map: "services_orders_details_service_order_id_fkey")
   @@map("services_orders_details")
 }
 
 model ServiceOrderExpenses {
-  id               String  @id @default(uuid())
-  companyId        String  @map("company_id")
-  serviceOrderId   String  @map("service_order_id")
-  projectId        String  @map("project_id")
-  projectExpenseId String  @map("project_expenses_id")
-  fileId           String? @map("file_id")
+  id               String          @id @default(uuid())
+  companyId        String          @map("company_id")
+  serviceOrderId   String          @map("service_order_id")
+  projectId        String          @map("project_id")
   value            String
+  projectExpenseId String          @map("project_expenses_id")
+  fileId           String?         @map("file_id")
+  company          Company         @relation(fields: [companyId], references: [id])
+  file             File?           @relation(fields: [fileId], references: [id])
+  projectExpenses  ProjectExpenses @relation(fields: [projectExpenseId], references: [id])
+  project          Project         @relation(fields: [projectId], references: [id])
+  serviceOrder     ServiceOrder    @relation(fields: [serviceOrderId], references: [id])
 
-  company         Company         @relation(fields: [companyId], references: [id])
-  serviceOrder    ServiceOrder    @relation(fields: [serviceOrderId], references: [id])
-  project         Project         @relation(fields: [projectId], references: [id])
-  projectExpenses ProjectExpenses @relation(fields: [projectExpenseId], references: [id])
-  file            File?           @relation(fields: [fileId], references: [id])
-
+  @@index([companyId], map: "services_orders_expenses_company_id_fkey")
+  @@index([fileId], map: "services_orders_expenses_file_id_fkey")
+  @@index([projectExpenseId], map: "services_orders_expenses_project_expenses_id_fkey")
+  @@index([projectId], map: "services_orders_expenses_project_id_fkey")
+  @@index([serviceOrderId], map: "services_orders_expenses_service_order_id_fkey")
   @@map("services_orders_expenses")
 }
 
@@ -262,8 +268,9 @@ enum Group {
 }
 
 enum OsStatus {
+  Rascunho
   Aberto
+  Validado
   Enviado
   Faturado
-  Cancelado
 }
