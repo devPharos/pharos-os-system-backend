@@ -27,6 +27,8 @@ import { ListCompaniesController } from "./controllers/list/list-companies.contr
 import { GetClientDataController } from "./controllers/get-client.controller";
 import { EditProfileController } from "./controllers/edit-profile.controller";
 import { GetCollaboratorProfileController } from "./controllers/get-collaborator.controller";
+import { GetCollaboratorsController } from "./controllers/get-collaborators.controller";
+import { GetCollaboratorsDataController } from "./controllers/get-collaborators-data.controller";
 
 @Module({
   imports: [
@@ -51,6 +53,8 @@ import { GetCollaboratorProfileController } from "./controllers/get-collaborator
     GetServiceOrderDataController,
     GetClientDataController,
     GetCollaboratorProfileController,
+    GetCollaboratorsController,
+    GetCollaboratorsDataController,
     CreateUserController,
     GetCurrentUserDataController,
     GetProjectsDataController,

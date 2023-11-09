@@ -6,16 +6,14 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { hash } from "bcryptjs";
-import { CurrentUser } from "src/auth/current-user.decorator";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
-import { UserPayload } from "src/auth/jwt.strategy";
 import { ZodValidationPipe } from "src/pipes/zod-validation.pipe";
 import { PrismaService } from "src/prisma/prisma.service";
 import { z } from "zod";
 
 const createUserBodySchema = z.object({
+  collaboratorId: z.string().uuid(),
   email: z.string().email(),
-  role: z.enum(["ADMIN", "COLLABORATOR", "CLIENT"]),
   password: z.string(),
 });
 
@@ -30,9 +28,8 @@ export class CreateUserController {
   async handle(
     @Body(new ZodValidationPipe(createUserBodySchema))
     body: CreateUserBodySchema,
-    @CurrentUser() user: UserPayload,
   ) {
-    const { email, password, role } = body;
+    const { email, password, collaboratorId } = body;
 
     const userWithSameEmail = await this.prisma.user.findUnique({
       where: {
@@ -48,34 +45,48 @@ export class CreateUserController {
 
     const hashedPassword = await hash(password, 8);
 
-    const group = await this.prisma.userGroups.findFirst({
-      where: {
-        group: {
-          equals: role,
-        },
-      },
-    });
-
-    const currentUser = await this.prisma.user.findUnique({
-      where: { id: user.sub },
+    const currentCollaborator = await this.prisma.collaborator.findUnique({
+      where: { id: collaboratorId },
     });
 
     const currentCompany = await this.prisma.company.findUnique({
       where: {
-        id: currentUser?.companyId,
+        id: currentCollaborator?.companyId,
       },
     });
 
-    await this.prisma.user.create({
-      data: {
+    const newUser = await this.prisma.user.upsert({
+      create: {
         company: {
           connect: { cnpj: currentCompany?.cnpj },
         },
         email,
         password: hashedPassword,
         group: {
-          connect: { id: group?.id },
+          connect: { id: 3 },
         },
+      },
+      update: {
+        company: {
+          connect: { cnpj: currentCompany?.cnpj },
+        },
+        email,
+        password: hashedPassword,
+        group: {
+          connect: { id: 3 },
+        },
+      },
+      where: {
+        email,
+      },
+    });
+
+    await this.prisma.collaborator.update({
+      where: {
+        id: collaboratorId,
+      },
+      data: {
+        userId: newUser.id,
       },
     });
   }
