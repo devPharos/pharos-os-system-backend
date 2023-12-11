@@ -15,6 +15,7 @@ import { z } from "zod";
 const createCollaboratorBodySchema = z.object({
   name: z.string(),
   lastName: z.string(),
+  supervisorId: z.string().uuid().optional(),
   cnpj: z.string(),
   phone: z.string(),
   country: z.string(),
@@ -52,6 +53,7 @@ export class CreateCollaboratorController {
       accountDigit,
       address,
       agency,
+      supervisorId,
       agencyDigit,
       bank,
       cep,
@@ -86,30 +88,73 @@ export class CreateCollaboratorController {
       },
     });
 
-    await this.prisma.collaborator.create({
-      data: {
-        account,
-        accountDigit,
-        address,
-        agency,
-        agencyDigit,
-        bank,
-        cep,
-        city,
-        cnpj,
-        complement,
-        country,
-        lastName,
-        name,
-        neighborhood,
-        number,
-        phone,
-        pixKey,
-        state,
-        company: {
-          connect: { id: currentCompany?.id },
-        },
-      },
-    });
+    // if (!supervisorId) {
+    //   await this.prisma.collaborator.create({
+    //     data: {
+    //       account,
+    //       accountDigit,
+    //       address,
+    //       agency,
+    //       agencyDigit,
+    //       bank,
+    //       cep,
+    //       city,
+    //       cnpj,
+    //       complement,
+    //       country,
+    //       lastName,
+    //       name,
+    //       neighborhood,
+    //       number,
+    //       phone,
+    //       pixKey,
+    //       state,
+    //       company: {
+    //         connect: { id: currentCompany?.id },
+    //       },
+    //     },
+    //   });
+    // } else {
+    //   const collaborator = await this.prisma.collaborator.create({
+    //     data: {
+    //       account,
+    //       accountDigit,
+    //       address,
+    //       agency,
+    //       agencyDigit,
+    //       bank,
+    //       cep,
+    //       city,
+    //       cnpj,
+    //       complement,
+    //       country,
+    //       lastName,
+    //       name,
+    //       neighborhood,
+    //       number,
+    //       phone,
+    //       pixKey,
+    //       state,
+    //       supervisor: {
+    //         connect: { id: supervisorId },
+    //       },
+    //       company: {
+    //         connect: { id: currentCompany?.id },
+    //       },
+    //     },
+    //   });
+
+    //   const supervisorUser = await this.prisma.user.findUnique({
+    //     where: {
+    //       id: superv,
+    //     },
+    //   });
+
+    //   await this.prisma.supervisor.upsert({
+    //     create: {
+    //       name,
+    //     },
+    //   });
+    // }
   }
 }

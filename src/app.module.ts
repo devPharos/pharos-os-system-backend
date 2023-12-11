@@ -29,6 +29,13 @@ import { EditProfileController } from "./controllers/edit-profile.controller";
 import { GetCollaboratorProfileController } from "./controllers/get-collaborator.controller";
 import { GetCollaboratorsController } from "./controllers/get-collaborators.controller";
 import { GetCollaboratorsDataController } from "./controllers/get-collaborators-data.controller";
+import { ListCollaboratorsController } from "./controllers/list/list-collaborators.controller";
+import { GetUserDataController } from "./controllers/get-current-user-data.controller";
+import { CreateClientUserController } from "./controllers/create/create-client-user.controller";
+import { CreateSupportTicketController } from "./controllers/create/create-support-ticket.controller";
+import { ListSupportTicketsController } from "./controllers/list/list-support-tickets.controller";
+import { ListSupportTicketsMessagesController } from "./controllers/list/list-ticket-messages.controller";
+import { CreateTicketMessageController } from "./controllers/create/create-ticket-messsage.controller";
 
 @Module({
   imports: [
@@ -50,8 +57,12 @@ import { GetCollaboratorsDataController } from "./controllers/get-collaborators-
     CreateServiceOrderExpensesController,
     CreateServiceOrderController,
     EditProfileController,
+    CreateTicketMessageController,
     GetServiceOrderDataController,
+    CreateSupportTicketController,
     GetClientDataController,
+    ListSupportTicketsController,
+    ListSupportTicketsMessagesController,
     GetCollaboratorProfileController,
     GetCollaboratorsController,
     GetCollaboratorsDataController,
@@ -60,6 +71,9 @@ import { GetCollaboratorsDataController } from "./controllers/get-collaborators-
     GetProjectsDataController,
     GetProjectExpensesController,
     GetProjectServicesController,
+    GetUserDataController,
+    ListCollaboratorsController,
+    CreateClientUserController,
     ListClientsController,
     ListCompaniesController,
     ListServiceOrdersController,

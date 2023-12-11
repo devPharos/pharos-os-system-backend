@@ -1,18 +1,22 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  NotAcceptableException,
-  Post,
-  UseGuards,
-} from "@nestjs/common";
+import { Body, Controller, HttpCode, Post, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { ZodValidationPipe } from "src/pipes/zod-validation.pipe";
 import { PrismaService } from "src/prisma/prisma.service";
 import { z } from "zod";
 
+const projectExpensesFormSchema = z.object({
+  description: z.string().min(1),
+  value: z.string().min(1),
+  requireReceipt: z.boolean().default(false),
+});
+
+const projectServicesFormSchema = z.object({
+  description: z.string().min(1),
+  chargesClient: z.boolean().default(false),
+  passCollaborator: z.boolean().default(false),
+});
+
 const createProjectBodySchema = z.object({
-  companyId: z.string().uuid(),
   clientId: z.string().uuid(),
   coordinatorId: z.string().uuid(),
   name: z.string(),
@@ -22,6 +26,8 @@ const createProjectBodySchema = z.object({
   hoursForecast: z.string(),
   hoursBalance: z.string(),
   hourValue: z.string(),
+  projectExpenses: projectExpensesFormSchema.array(),
+  projectServices: projectServicesFormSchema.array(),
 });
 
 type CreateProjectBodySchema = z.infer<typeof createProjectBodySchema>;
@@ -38,7 +44,6 @@ export class CreateProjectController {
   ) {
     const {
       clientId,
-      companyId,
       coordinatorId,
       deliveryForecast,
       endDate,
@@ -47,15 +52,17 @@ export class CreateProjectController {
       hoursForecast,
       name,
       startDate,
+      projectExpenses,
+      projectServices,
     } = body;
 
-    if (startDate < endDate) {
-      throw new NotAcceptableException(
-        "Start date cannot be earlier than end date",
-      );
-    }
+    const client = await this.prisma.client.findUnique({
+      where: {
+        id: clientId,
+      },
+    });
 
-    await this.prisma.project.create({
+    const project = await this.prisma.project.create({
       data: {
         deliveryForecast,
         endDate,
@@ -65,7 +72,7 @@ export class CreateProjectController {
         name,
         startDate,
         company: {
-          connect: { id: companyId },
+          connect: { id: client?.companyId },
         },
         client: {
           connect: { id: clientId },
@@ -75,5 +82,39 @@ export class CreateProjectController {
         },
       },
     });
+
+    projectExpenses.forEach(
+      async (expense) =>
+        await this.prisma.projectExpenses.create({
+          data: {
+            description: expense.description,
+            value: expense.value,
+            company: {
+              connect: { id: project.companyId },
+            },
+            project: {
+              connect: { id: project.id },
+            },
+            requireReceipt: expense.requireReceipt,
+          },
+        }),
+    );
+
+    projectServices.forEach(
+      async (service) =>
+        await this.prisma.projectService.create({
+          data: {
+            description: service.description,
+            chargesClient: service.chargesClient,
+            company: {
+              connect: { id: project.companyId },
+            },
+            project: {
+              connect: { id: project.id },
+            },
+            passCollaborator: service.passCollaborator,
+          },
+        }),
+    );
   }
 }

@@ -32,6 +32,8 @@ model Company {
   serviceOrderDetails  ServiceOrderDetails[]
   serviceOrderExpenses ServiceOrderExpenses[]
   users                User[]
+  Support              Support[]
+  Supervisor           Supervisor[]
 
   @@map("companies")
 }
@@ -45,15 +47,17 @@ model UserGroups {
 }
 
 model User {
-  id           String        @id @default(uuid())
-  companyId    String        @map("company_id")
-  groupId      Int           @map("group_id")
-  email        String        @unique
-  password     String
-  client       Client?
-  collaborator Collaborator?
-  company      Company       @relation(fields: [companyId], references: [id])
-  group        UserGroups    @relation(fields: [groupId], references: [id])
+  id             String           @id @default(uuid())
+  companyId      String           @map("company_id")
+  groupId        Int              @map("group_id")
+  email          String           @unique
+  password       String
+  client         Client?
+  collaborator   Collaborator?
+  company        Company          @relation(fields: [companyId], references: [id])
+  group          UserGroups       @relation(fields: [groupId], references: [id])
+  SupportMessage SupportMessage[]
+  Supervisor     Supervisor?
 
   @@index([companyId], map: "users_company_id_fkey")
   @@index([groupId], map: "users_group_id_fkey")
@@ -74,10 +78,23 @@ model File {
   @@map("files")
 }
 
+model Supervisor {
+  id        String  @id @default(uuid())
+  companyId String  @map("company_id")
+  userId    String? @unique @map("user_id")
+  name      String
+  lastName  String  @map("last_name")
+
+  company      Company        @relation(fields: [companyId], references: [id])
+  user         User?          @relation(fields: [userId], references: [id])
+  Collaborator Collaborator[]
+}
+
 model Collaborator {
   id            String         @id @default(uuid())
   companyId     String         @map("company_id")
   userId        String?        @unique @map("user_id")
+  supervisorId  String?
   name          String
   lastName      String         @map("last_name")
   cnpj          String         @unique
@@ -100,6 +117,8 @@ model Collaborator {
   user          User?          @relation(fields: [userId], references: [id])
   projects      Project[]
   serviceOrders ServiceOrder[]
+  Support       Support[]
+  Supervisor    Supervisor?    @relation(fields: [supervisorId], references: [id])
 
   @@index([companyId], map: "collaborators_company_id_fkey")
   @@map("collaborators")
@@ -132,6 +151,7 @@ model Client {
   user           User?          @relation(fields: [userId], references: [id])
   projects       Project[]
   servicesOrders ServiceOrder[]
+  Support        Support[]
 
   @@index([companyId], map: "clients_company_id_fkey")
   @@map("clients")
@@ -144,10 +164,10 @@ model Project {
   coordinatorId        String                 @map("coordinator_id")
   name                 String
   startDate            DateTime               @map("start_date")
-  endDate              DateTime               @map("end_date")
+  endDate              DateTime?              @map("end_date")
   deliveryForecast     DateTime               @map("delivery_forecast")
   hoursForecast        String                 @map("hours_forecast")
-  hoursBalance         String                 @map("hours_balance")
+  hoursBalance         String?                @map("hours_balance")
   hourValue            String                 @map("hour_value")
   client               Client                 @relation(fields: [clientId], references: [id])
   company              Company                @relation(fields: [companyId], references: [id])
@@ -156,6 +176,7 @@ model Project {
   projectsServices     ProjectService[]
   serviceOrderDetails  ServiceOrderDetails[]
   serviceOrderExpenses ServiceOrderExpenses[]
+  Support              Support[]
 
   @@index([clientId], map: "projects_client_id_fkey")
   @@index([companyId], map: "projects_company_id_fkey")
@@ -259,6 +280,49 @@ model ServiceOrderExpenses {
   @@index([projectId], map: "services_orders_expenses_project_id_fkey")
   @@index([serviceOrderId], map: "services_orders_expenses_service_order_id_fkey")
   @@map("services_orders_expenses")
+}
+
+model Support {
+  id             String          @id @default(uuid())
+  collaboratorId String
+  companyId      String
+  clientId       String
+  projectId      String
+  title          String
+  startDate      DateTime?
+  endDate        DateTime
+  status         SupportStatus   @default(NaoIniciado)
+  priority       SupportPriority @default(Media)
+
+  collaborator   Collaborator     @relation(fields: [collaboratorId], references: [id])
+  company        Company          @relation(fields: [companyId], references: [id])
+  client         Client           @relation(fields: [clientId], references: [id])
+  project        Project          @relation(fields: [projectId], references: [id])
+  SupportMessage SupportMessage[]
+}
+
+model SupportMessage {
+  id        String   @id @default(uuid())
+  userId    String
+  supportId String
+  message   String   @db.LongText
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  support Support @relation(fields: [supportId], references: [id])
+}
+
+enum SupportPriority {
+  Alta
+  Media
+  Baixa
+}
+
+enum SupportStatus {
+  Atraso
+  NaoIniciado
+  Iniciado
+  Finalizado
 }
 
 enum Group {
