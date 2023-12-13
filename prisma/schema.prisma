@@ -170,6 +170,7 @@ model Project {
   hoursForecast        String                 @map("hours_forecast")
   hoursBalance         String?                @map("hours_balance")
   hourValue            String                 @map("hour_value")
+  status               ProjectStatus          @default(NaoIniciado)
   client               Client                 @relation(fields: [clientId], references: [id])
   company              Company                @relation(fields: [companyId], references: [id])
   collaborator         Collaborator           @relation(fields: [coordinatorId], references: [id])
@@ -338,4 +339,11 @@ enum OsStatus {
   Validado
   Enviado
   Faturado
+}
+
+enum ProjectStatus {
+  NaoIniciado
+  Iniciado
+  Finalizado
+  Cancelado
 }

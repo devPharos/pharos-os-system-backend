@@ -20,7 +20,7 @@
     "@nestjs/jwt": "^10.1.0",
     "@nestjs/passport": "^10.0.1",
     "@nestjs/platform-express": "^10.2.5",
-    "@prisma/client": "^5.2.0",
+    "@prisma/client": "^5.7.0",
     "@types/passport-jwt": "^3.0.9",
     "bcryptjs": "^2.4.3",
     "date-fns": "^2.30.0",
