@@ -37,6 +37,8 @@ import { ListSupportTicketsController } from "./controllers/list/list-support-ti
 import { ListSupportTicketsMessagesController } from "./controllers/list/list-ticket-messages.controller";
 import { CreateTicketMessageController } from "./controllers/create/create-ticket-messsage.controller";
 
+import { PdfModule } from "./pdf/pdf.module";
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -44,6 +46,7 @@ import { CreateTicketMessageController } from "./controllers/create/create-ticke
       isGlobal: true,
     }),
     AuthModule,
+    PdfModule,
   ],
   controllers: [
     AuthenticateUserController,

@@ -96,6 +96,7 @@ model Collaborator {
   userId        String?        @unique @map("user_id")
   supervisorId  String?
   name          String
+  value         String         @default("0")
   lastName      String         @map("last_name")
   cnpj          String         @unique
   phone         String
