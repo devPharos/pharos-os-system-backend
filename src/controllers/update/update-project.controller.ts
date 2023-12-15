@@ -1,5 +1,7 @@
 import { Body, Controller, HttpCode, Put, UseGuards } from "@nestjs/common";
+import { CurrentUser } from "src/auth/current-user.decorator";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
+import { UserPayload } from "src/auth/jwt.strategy";
 import { PrismaService } from "src/prisma/prisma.service";
 import { z } from "zod";
 
@@ -40,7 +42,10 @@ export class UpdateProjectController {
   constructor(private prisma: PrismaService) {}
   @Put("/project")
   @HttpCode(201)
-  async handle(@Body() body: UpdateProjectSchema) {
+  async handle(
+    @Body() body: UpdateProjectSchema,
+    @CurrentUser() user: UserPayload,
+  ) {
     const {
       clientId,
       coordinatorId,
@@ -73,30 +78,84 @@ export class UpdateProjectController {
       },
     });
 
-    projectExpenses.map(async (newExpense) => {
-      await this.prisma.projectExpenses.update({
-        where: {
-          id: newExpense.id,
-        },
-        data: {
-          description: newExpense.description,
-          requireReceipt: newExpense.requireReceipt,
-          value: newExpense.value,
-        },
-      });
+    const currentUser = await this.prisma.user.findUnique({
+      where: {
+        id: user.sub,
+      },
     });
 
-    projectServices.map(async (service) => {
-      await this.prisma.projectService.update({
-        where: {
-          id: service.id,
-        },
-        data: {
-          chargesClient: service.chargesClient,
-          description: service.description,
-          passCollaborator: service.passCollaborator,
-        },
+    if (projectExpenses?.length > 0) {
+      projectExpenses?.map(async (newExpense) => {
+        if (newExpense.id) {
+          await this.prisma.projectExpenses.update({
+            where: {
+              id: newExpense.id,
+            },
+            data: {
+              description: newExpense.description,
+              requireReceipt: newExpense.requireReceipt,
+              value: newExpense.value,
+            },
+          });
+        }
+
+        if (!newExpense.id) {
+          await this.prisma.projectExpenses.create({
+            data: {
+              description: newExpense.description,
+              requireReceipt: newExpense.requireReceipt,
+              value: newExpense.value,
+              project: {
+                connect: {
+                  id: projectId,
+                },
+              },
+              company: {
+                connect: {
+                  id: currentUser?.companyId,
+                },
+              },
+            },
+          });
+        }
       });
-    });
+    }
+
+    if (projectServices?.length > 0) {
+      projectServices.map(async (service) => {
+        if (service.id) {
+          await this.prisma.projectService.update({
+            where: {
+              id: service.id,
+            },
+            data: {
+              chargesClient: service.chargesClient,
+              description: service.description,
+              passCollaborator: service.passCollaborator,
+            },
+          });
+        }
+
+        if (!service.id) {
+          await this.prisma.projectService.create({
+            data: {
+              chargesClient: service.chargesClient,
+              description: service.description,
+              passCollaborator: service.passCollaborator,
+              project: {
+                connect: {
+                  id: projectId,
+                },
+              },
+              company: {
+                connect: {
+                  id: currentUser?.companyId,
+                },
+              },
+            },
+          });
+        }
+      });
+    }
   }
 }

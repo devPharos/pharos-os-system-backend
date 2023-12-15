@@ -40,6 +40,8 @@ import { CreateTicketMessageController } from "./controllers/create/create-ticke
 import { PdfModule } from "./pdf/pdf.module";
 import { FindProjectController } from "./controllers/find/find-project.controller";
 import { UpdateProjectController } from "./controllers/update/update-project.controller";
+import { DeleteExpenseController } from "./controllers/delete/delete-project-expense.controller";
+import { DeleteServiceController } from "./controllers/delete/delete-project-service.controller";
 
 @Module({
   imports: [
@@ -84,7 +86,9 @@ import { UpdateProjectController } from "./controllers/update/update-project.con
     UpdateProjectController,
     ListCompaniesController,
     ListServiceOrdersController,
+    DeleteExpenseController,
     LogOutUserController,
+    DeleteServiceController,
     UpdateCollaboratorController,
   ],
   providers: [PrismaService],
