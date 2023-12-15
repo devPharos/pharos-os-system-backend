@@ -21,10 +21,10 @@ const createProjectBodySchema = z.object({
   coordinatorId: z.string().uuid(),
   name: z.string(),
   startDate: z.coerce.date(),
-  endDate: z.coerce.date(),
+  endDate: z.coerce.date().optional(),
   deliveryForecast: z.string(),
   hoursForecast: z.string(),
-  hoursBalance: z.string(),
+  hoursBalance: z.string().optional(),
   hourValue: z.string(),
   projectExpenses: projectExpensesFormSchema.array(),
   projectServices: projectServicesFormSchema.array(),
@@ -62,10 +62,12 @@ export class CreateProjectController {
       },
     });
 
+    const newEndDate = endDate || null;
+
     const project = await this.prisma.project.create({
       data: {
         deliveryForecast,
-        endDate,
+        endDate: newEndDate,
         hourValue,
         hoursBalance,
         hoursForecast,

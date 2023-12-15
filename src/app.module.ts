@@ -38,6 +38,8 @@ import { ListSupportTicketsMessagesController } from "./controllers/list/list-ti
 import { CreateTicketMessageController } from "./controllers/create/create-ticket-messsage.controller";
 
 import { PdfModule } from "./pdf/pdf.module";
+import { FindProjectController } from "./controllers/find/find-project.controller";
+import { UpdateProjectController } from "./controllers/update/update-project.controller";
 
 @Module({
   imports: [
@@ -77,7 +79,9 @@ import { PdfModule } from "./pdf/pdf.module";
     GetUserDataController,
     ListCollaboratorsController,
     CreateClientUserController,
+    FindProjectController,
     ListClientsController,
+    UpdateProjectController,
     ListCompaniesController,
     ListServiceOrdersController,
     LogOutUserController,
