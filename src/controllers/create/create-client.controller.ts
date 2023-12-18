@@ -23,14 +23,14 @@ const createClientBodySchema = z.object({
   neighborhood: z.string(),
   address: z.string(),
   number: z.string(),
-  complement: z.string(),
+  complement: z.string().optional(),
   cep: z.string(),
   bank: z.string(),
   agency: z.string(),
-  agencyDigit: z.string().max(1),
+  agencyDigit: z.string().max(1).optional(),
   account: z.string(),
-  accountDigit: z.string().max(1),
-  pixKey: z.string(),
+  accountDigit: z.string().max(1).optional(),
+  pixKey: z.string().optional(),
 });
 
 type CreateClientBodySchema = z.infer<typeof createClientBodySchema>;
