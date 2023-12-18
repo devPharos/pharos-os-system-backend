@@ -43,6 +43,7 @@ import { UpdateProjectController } from "./controllers/update/update-project.con
 import { DeleteExpenseController } from "./controllers/delete/delete-project-expense.controller";
 import { DeleteServiceController } from "./controllers/delete/delete-project-service.controller";
 import { UpdateClientStatusController } from "./controllers/update/update-client-status.controller";
+import { UpdateClientController } from "./controllers/update/update-client.controller";
 
 @Module({
   imports: [
@@ -90,6 +91,7 @@ import { UpdateClientStatusController } from "./controllers/update/update-client
     DeleteExpenseController,
     LogOutUserController,
     DeleteServiceController,
+    UpdateClientController,
     UpdateCollaboratorController,
     UpdateClientStatusController,
   ],
