@@ -40,48 +40,48 @@ export class ListServiceOrdersController {
       },
     });
 
-    type SupervisedOs = typeof serviceOrders;
+    // type SupervisedOs = typeof serviceOrders;
 
-    const supervisedCollaborators = await this.prisma.collaborator.findMany({
-      where: {
-        supervisorId: collaborator?.id,
-      },
-      select: {
-        id: true,
-      },
-    });
+    // const supervisedCollaborators = await this.prisma.collaborator.findMany({
+    //   where: {
+    //     supervisorId: collaborator?.id,
+    //   },
+    //   select: {
+    //     id: true,
+    //   },
+    // });
 
-    if (supervisedCollaborators.length > 0) {
-      const collaboratorsServiceOrders: SupervisedOs = [];
+    // if (supervisedCollaborators.length > 0) {
+    //   const collaboratorsServiceOrders: SupervisedOs = [];
 
-      supervisedCollaborators.forEach(async (collaborator) => {
-        const os: SupervisedOs = await this.prisma.serviceOrder.findMany({
-          where: {
-            collaboratorId: collaborator?.id,
-          },
-          select: {
-            id: true,
-            clientId: true,
-            status: true,
-            startDate: true,
-            endDate: true,
-            date: true,
-            collaborator: {
-              select: {
-                name: true,
-                lastName: true,
-              },
-            },
-          },
-        });
+    //   supervisedCollaborators.forEach(async (collaborator) => {
+    //     const os: SupervisedOs = await this.prisma.serviceOrder.findMany({
+    //       where: {
+    //         collaboratorId: collaborator?.id,
+    //       },
+    //       select: {
+    //         id: true,
+    //         clientId: true,
+    //         status: true,
+    //         startDate: true,
+    //         endDate: true,
+    //         date: true,
+    //         collaborator: {
+    //           select: {
+    //             name: true,
+    //             lastName: true,
+    //           },
+    //         },
+    //       },
+    //     });
 
-        os.forEach((os) => {
-          collaboratorsServiceOrders.push(os);
-        });
-      });
+    //     os.forEach((os) => {
+    //       collaboratorsServiceOrders.push(os);
+    //     });
+    //   });
 
-      return collaboratorsServiceOrders;
-    }
+    //   return collaboratorsServiceOrders;
+    // }
 
     return serviceOrders;
   }

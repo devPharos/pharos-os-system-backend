@@ -4,28 +4,84 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { z } from "zod";
 
 const updateCollaboratorBodySchema = z.object({
-  userId: z.string().uuid(),
+  name: z.string(),
+  lastName: z.string(),
+  supervisorId: z.string().uuid().optional(),
   cnpj: z.string(),
+  phone: z.string(),
+  country: z.string(),
+  state: z.string(),
+  city: z.string(),
+  neighborhood: z.string(),
+  address: z.string(),
+  number: z.string(),
+  complement: z.string().optional(),
+  cep: z.string(),
+  bank: z.string(),
+  agency: z.string(),
+  agencyDigit: z.string().max(1).optional(),
+  account: z.string(),
+  accountDigit: z.string().max(1).optional(),
+  pixKey: z.string().optional(),
 });
 
 type UpdateCollaboratorBodySchema = z.infer<
   typeof updateCollaboratorBodySchema
 >;
 
-@Controller("/accounts")
+@Controller("/update")
 @UseGuards(JwtAuthGuard)
 export class UpdateCollaboratorController {
   constructor(private prisma: PrismaService) {}
   @Put("/collaborator")
   @HttpCode(201)
   async handle(@Body() body: UpdateCollaboratorBodySchema) {
-    const { userId, cnpj } = body;
+    const {
+      account,
+      accountDigit,
+      address,
+      agency,
+      supervisorId,
+      agencyDigit,
+      bank,
+      cep,
+      city,
+      cnpj,
+      complement,
+      country,
+      lastName,
+      name,
+      neighborhood,
+      number,
+      phone,
+      pixKey,
+      state,
+    } = body;
 
     await this.prisma.collaborator.update({
       where: { cnpj },
       data: {
-        user: {
-          connect: { id: userId },
+        account,
+        accountDigit,
+        address,
+        agency,
+        agencyDigit,
+        bank,
+        cep,
+        city,
+        complement,
+        country,
+        lastName,
+        name,
+        neighborhood,
+        number,
+        phone,
+        pixKey,
+        state,
+        supervisor: {
+          connect: {
+            id: supervisorId,
+          },
         },
       },
     });

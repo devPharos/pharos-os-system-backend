@@ -24,14 +24,14 @@ const createCollaboratorBodySchema = z.object({
   neighborhood: z.string(),
   address: z.string(),
   number: z.string(),
-  complement: z.string(),
+  complement: z.string().optional(),
   cep: z.string(),
   bank: z.string(),
   agency: z.string(),
-  agencyDigit: z.string().max(1),
+  agencyDigit: z.string().max(1).optional(),
   account: z.string(),
-  accountDigit: z.string().max(1),
-  pixKey: z.string(),
+  accountDigit: z.string().max(1).optional(),
+  pixKey: z.string().optional(),
 });
 
 type CreateCollaboratorBodySchema = z.infer<
@@ -70,91 +70,92 @@ export class CreateCollaboratorController {
       state,
     } = body;
 
-    const collaboratorWithSameCnpj = await this.prisma.collaborator.findUnique({
-      where: { cnpj },
-    });
-
-    if (collaboratorWithSameCnpj) {
-      throw new ConflictException("Collaborator with same cnpj already exists");
-    }
-
     const currentUser = await this.prisma.user.findUnique({
-      where: { id: user.sub },
-    });
-
-    const currentCompany = await this.prisma.company.findUnique({
       where: {
-        id: currentUser?.companyId,
+        id: user.sub,
+      },
+      select: {
+        companyId: true,
       },
     });
 
-    // if (!supervisorId) {
-    //   await this.prisma.collaborator.create({
-    //     data: {
-    //       account,
-    //       accountDigit,
-    //       address,
-    //       agency,
-    //       agencyDigit,
-    //       bank,
-    //       cep,
-    //       city,
-    //       cnpj,
-    //       complement,
-    //       country,
-    //       lastName,
-    //       name,
-    //       neighborhood,
-    //       number,
-    //       phone,
-    //       pixKey,
-    //       state,
-    //       company: {
-    //         connect: { id: currentCompany?.id },
-    //       },
-    //     },
-    //   });
-    // } else {
-    //   const collaborator = await this.prisma.collaborator.create({
-    //     data: {
-    //       account,
-    //       accountDigit,
-    //       address,
-    //       agency,
-    //       agencyDigit,
-    //       bank,
-    //       cep,
-    //       city,
-    //       cnpj,
-    //       complement,
-    //       country,
-    //       lastName,
-    //       name,
-    //       neighborhood,
-    //       number,
-    //       phone,
-    //       pixKey,
-    //       state,
-    //       supervisor: {
-    //         connect: { id: supervisorId },
-    //       },
-    //       company: {
-    //         connect: { id: currentCompany?.id },
-    //       },
-    //     },
-    //   });
+    const existentCollaborator = await this.prisma.client.findUnique({
+      where: {
+        cnpj,
+      },
+    });
 
-    //   const supervisorUser = await this.prisma.user.findUnique({
-    //     where: {
-    //       id: superv,
-    //     },
-    //   });
+    if (existentCollaborator) {
+      throw new ConflictException(
+        "Already has a collaborator with this CNPJ/CPF",
+      );
+    }
 
-    //   await this.prisma.supervisor.upsert({
-    //     create: {
-    //       name,
-    //     },
-    //   });
-    // }
+    if (supervisorId) {
+      const collaborator = this.prisma.collaborator.create({
+        data: {
+          account,
+          accountDigit,
+          address,
+          agency,
+          agencyDigit,
+          bank,
+          cep,
+          city,
+          cnpj,
+          complement,
+          country,
+          lastName,
+          name,
+          neighborhood,
+          number,
+          phone,
+          pixKey,
+          state,
+          company: {
+            connect: {
+              id: currentUser?.companyId || "",
+            },
+          },
+          supervisor: {
+            connect: {
+              id: supervisorId,
+            },
+          },
+        },
+      });
+
+      return collaborator;
+    }
+
+    const collaborator = this.prisma.collaborator.create({
+      data: {
+        account,
+        accountDigit,
+        address,
+        agency,
+        agencyDigit,
+        bank,
+        cep,
+        city,
+        cnpj,
+        complement,
+        country,
+        lastName,
+        name,
+        neighborhood,
+        number,
+        phone,
+        pixKey,
+        state,
+        company: {
+          connect: {
+            id: currentUser?.companyId || "",
+          },
+        },
+      },
+    });
+
+    return collaborator;
   }
 }
