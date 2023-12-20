@@ -44,6 +44,8 @@ import { DeleteExpenseController } from "./controllers/delete/delete-project-exp
 import { DeleteServiceController } from "./controllers/delete/delete-project-service.controller";
 import { UpdateClientStatusController } from "./controllers/update/update-client-status.controller";
 import { UpdateClientController } from "./controllers/update/update-client.controller";
+import { UpdateUserController } from "./controllers/update/update-user.controller";
+import { FindUserController } from "./controllers/find/find-user.controller";
 
 @Module({
   imports: [
@@ -94,6 +96,8 @@ import { UpdateClientController } from "./controllers/update/update-client.contr
     UpdateClientController,
     UpdateCollaboratorController,
     UpdateClientStatusController,
+    UpdateUserController,
+    FindUserController,
   ],
   providers: [PrismaService],
 })
