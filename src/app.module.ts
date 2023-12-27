@@ -51,6 +51,8 @@ import { FindCollaboratorController } from "./controllers/find/find-collaborator
 import { ListServiceOrdersFiltersController } from "./controllers/list/list-service-order-filters.controller";
 import { DeleteServiceOrderController } from "./controllers/delete/delete-service-order.controller";
 import { UpdateServiceOrderController } from "./controllers/update/update-service-order-status.controller";
+import { FindServiceOrderController } from "./controllers/find/find-service-order.controller";
+import { DeleteOSExpenseController } from "./controllers/delete/delete-service-order-expense.controller";
 
 @Module({
   imports: [
@@ -108,6 +110,8 @@ import { UpdateServiceOrderController } from "./controllers/update/update-servic
     ListServiceOrdersFiltersController,
     DeleteServiceOrderController,
     UpdateServiceOrderController,
+    FindServiceOrderController,
+    DeleteOSExpenseController,
   ],
   providers: [PrismaService],
 })
