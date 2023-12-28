@@ -12,7 +12,7 @@ type UpdateServiceOrderSchema = z.infer<typeof updateServiceOrderStatusSchema>;
 
 @Controller("/update")
 @UseGuards(JwtAuthGuard)
-export class UpdateServiceOrderController {
+export class UpdateServiceStatusOrderController {
   constructor(private prisma: PrismaService) {}
   @Put("/service-order/status")
   @HttpCode(201)

@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, HttpCode, Put, UseGuards } from "@nestjs/common";
 import { differenceInHours } from "date-fns";
 import { CurrentUser } from "src/auth/current-user.decorator";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
@@ -9,6 +9,7 @@ import { z } from "zod";
 
 const serviceOrderProjectExpenses = z.object({
   id: z.string().uuid(),
+  serviceOrderExpenseId: z.string().uuid(),
   description: z.string(),
   value: z.string(),
 });
@@ -24,6 +25,7 @@ const serviceOrderProjectService = z.object({
 });
 
 const serviceOrderDetails = z.object({
+  id: z.string().uuid(),
   description: z.string(),
   endDate: z.string(),
   startDate: z.string(),
@@ -31,7 +33,8 @@ const serviceOrderDetails = z.object({
   projectServices: serviceOrderProjectService,
 });
 
-const createServiceOrderBodySchema = z.object({
+const updateServiceOrderBodySchema = z.object({
+  id: z.string().uuid(),
   clientId: z.string().uuid(),
   date: z.coerce.date(),
   serviceType: z.enum(["Presencial", "Remoto"]),
@@ -39,22 +42,23 @@ const createServiceOrderBodySchema = z.object({
   serviceOrderDetails: z.array(serviceOrderDetails),
 });
 
-type CreateServiceOrderBodySchema = z.infer<
-  typeof createServiceOrderBodySchema
+type UpdateServiceOrderBodySchema = z.infer<
+  typeof updateServiceOrderBodySchema
 >;
 
-@Controller("/service-order")
+@Controller("/update")
 @UseGuards(JwtAuthGuard)
-export class CreateServiceOrderController {
+export class UpdateServiceOrderController {
   constructor(private prisma: PrismaService) {}
-  @Post()
+  @Put("/service-order")
   @HttpCode(201)
   async handle(
-    @Body(new ZodValidationPipe(createServiceOrderBodySchema))
-    body: CreateServiceOrderBodySchema,
+    @Body(new ZodValidationPipe(updateServiceOrderBodySchema))
+    body: UpdateServiceOrderBodySchema,
     @CurrentUser() user: UserPayload,
   ) {
-    const { date, serviceOrderDetails, clientId, serviceType, status } = body;
+    const { date, serviceOrderDetails, clientId, serviceType, status, id } =
+      body;
     const collaborator = await this.prisma.collaborator.findUnique({
       where: {
         userId: user.sub,
@@ -80,7 +84,10 @@ export class CreateServiceOrderController {
       parseDate(startDate, date),
     ).toString();
 
-    const serviceOrder = await this.prisma.serviceOrder.create({
+    const serviceOrder = await this.prisma.serviceOrder.update({
+      where: {
+        id,
+      },
       data: {
         endDate: parseDate(endDate, date),
         startDate: parseDate(startDate, date),
@@ -95,8 +102,20 @@ export class CreateServiceOrderController {
     });
 
     serviceOrderDetails.map(async (detail) => {
-      await this.prisma.serviceOrderDetails.create({
-        data: {
+      await this.prisma.serviceOrderDetails.upsert({
+        where: {
+          id: detail.id,
+        },
+        update: {
+          description: detail.description,
+          endDate: parseDate(detail.endDate, date),
+          startDate: parseDate(detail.startDate, date),
+          projectId: detail.project.id,
+          companyId: collaborator?.companyId || "",
+          serviceOrderId: serviceOrder.id,
+          projectServiceId: detail.projectServices.id,
+        },
+        create: {
           description: detail.description,
           endDate: parseDate(detail.endDate, date),
           startDate: parseDate(detail.startDate, date),
@@ -108,8 +127,18 @@ export class CreateServiceOrderController {
       });
 
       detail.project.projectsExpenses.map(async (expense) => {
-        await this.prisma.serviceOrderExpenses.create({
-          data: {
+        await this.prisma.serviceOrderExpenses.upsert({
+          where: {
+            id: expense.serviceOrderExpenseId,
+          },
+          update: {
+            value: expense.value,
+            projectExpenseId: expense.id,
+            serviceOrderId: serviceOrder.id,
+            projectId: detail.project.id,
+            companyId: collaborator?.companyId || "",
+          },
+          create: {
             value: expense.value,
             projectExpenseId: expense.id,
             serviceOrderId: serviceOrder.id,
@@ -120,7 +149,7 @@ export class CreateServiceOrderController {
       });
     });
 
-    return "created";
+    return "updated";
   }
 }
 

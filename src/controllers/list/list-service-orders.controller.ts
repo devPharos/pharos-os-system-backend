@@ -126,6 +126,7 @@ export class ListServiceOrdersController {
             name: true,
             lastName: true,
             supervisorId: true,
+            id: true,
           },
         },
         client: {
@@ -174,6 +175,7 @@ export class ListServiceOrdersController {
               name: true,
               lastName: true,
               supervisorId: true,
+              id: true,
             },
           },
         },
@@ -184,6 +186,8 @@ export class ListServiceOrdersController {
       serviceOrders,
       serviceOrdersSupervisedByMe,
       defaultDate,
+      date: defaultDate.date,
+      formattedDate: defaultDate.formattedDate,
     };
   }
 }
