@@ -57,6 +57,7 @@ import { UpdateServiceOrderController } from "./controllers/update/update-servic
 import { ListProjectsController } from "./controllers/list/list-projects.controller";
 import { ListProjectCollaboratorsController } from "./controllers/list/list-project-collaborators.controller";
 import { UpdateSupportTicketController } from "./controllers/update/update-ticket-info.controller";
+import { ListHomeDataController } from "./controllers/list/list-home-data.controller";
 
 @Module({
   imports: [
@@ -120,6 +121,7 @@ import { UpdateSupportTicketController } from "./controllers/update/update-ticke
     ListProjectsController,
     ListProjectCollaboratorsController,
     UpdateSupportTicketController,
+    ListHomeDataController,
   ],
   providers: [PrismaService],
 })
