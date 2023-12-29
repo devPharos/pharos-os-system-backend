@@ -12,6 +12,13 @@ const createSupportTicketBodySchema = z.object({
   collaboratorId: z.string().uuid(),
   projectId: z.string().uuid(),
   priority: z.enum(["Alta", "Media", "Baixa"]),
+  helper: z.enum([
+    "Desenvolvimento",
+    "Suporte",
+    "Infraestrutura",
+    "Modulos",
+    "Faturamento",
+  ]),
   title: z.string(),
 });
 
@@ -29,7 +36,8 @@ export class CreateSupportTicketController {
     body: CreateSupportTicketBodySchema,
     @CurrentUser() user: UserPayload,
   ) {
-    const { collaboratorId, message, priority, projectId, title } = body;
+    const { collaboratorId, message, priority, projectId, title, helper } =
+      body;
 
     const client = await this.prisma.client.findUnique({
       where: {
@@ -37,6 +45,16 @@ export class CreateSupportTicketController {
       },
       select: {
         id: true,
+        companyId: true,
+      },
+    });
+
+    const pj = await this.prisma.project.findUnique({
+      where: {
+        id: projectId,
+      },
+      select: {
+        clientId: true,
         companyId: true,
       },
     });
@@ -50,36 +68,37 @@ export class CreateSupportTicketController {
             days: 5, // add 5 dias
           })
         : priority === "Media"
-        ? add(today, {
-            days: 10, // add 10 dias
-          })
-        : add(today, {
-            days: 15, // add 15 dias
-          });
+          ? add(today, {
+              days: 10, // add 10 dias
+            })
+          : add(today, {
+              days: 15, // add 15 dias
+            });
 
     const supportTicket = await this.prisma.support.create({
       data: {
         title,
         priority,
+        helperTopic: helper,
         collaborator: {
           connect: {
             id: collaboratorId,
           },
         },
-        client: {
-          connect: {
-            id: client?.id,
-          },
-        },
         company: {
           connect: {
-            id: client?.companyId,
+            id: client ? client.companyId : pj?.companyId,
           },
         },
         endDate,
         project: {
           connect: {
             id: projectId,
+          },
+        },
+        client: {
+          connect: {
+            id: client ? client.id : pj?.clientId,
           },
         },
       },

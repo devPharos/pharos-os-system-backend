@@ -30,12 +30,12 @@ export class ListSupportTicketsController {
       },
     });
 
-    const tickets = await this.prisma.support.findMany({
+    const clientTickets = await this.prisma.support.findMany({
       where: {
-        collaboratorId: collaborator?.id,
+        clientId: client?.id,
         OR: [
           {
-            clientId: client?.id,
+            collaboratorId: collaborator?.id,
           },
         ],
       },
@@ -44,6 +44,7 @@ export class ListSupportTicketsController {
         title: true,
         status: true,
         priority: true,
+        helperTopic: true,
         client: {
           select: {
             id: true,
@@ -52,6 +53,27 @@ export class ListSupportTicketsController {
         },
       },
     });
+
+    const collaboratorTickets = await this.prisma.support.findMany({
+      where: {
+        collaboratorId: collaborator?.id,
+      },
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        priority: true,
+        helperTopic: true,
+        client: {
+          select: {
+            id: true,
+            fantasyName: true,
+          },
+        },
+      },
+    });
+
+    const tickets = client ? clientTickets : collaboratorTickets;
 
     return tickets;
   }

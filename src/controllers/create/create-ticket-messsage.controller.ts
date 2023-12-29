@@ -40,6 +40,7 @@ export class CreateTicketMessageController {
       select: {
         id: true,
         message: true,
+        createdAt: true,
         user: {
           select: {
             id: true,

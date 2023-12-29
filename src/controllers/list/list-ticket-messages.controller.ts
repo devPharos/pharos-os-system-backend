@@ -1,4 +1,5 @@
 import { Controller, Get, Headers, HttpCode, UseGuards } from "@nestjs/common";
+import { format } from "date-fns";
 import { CurrentUser } from "src/auth/current-user.decorator";
 
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
@@ -36,9 +37,17 @@ export class ListSupportTicketsMessagesController {
             lastName: true,
           },
         },
+        title: true,
+        helperTopic: true,
         status: true,
         priority: true,
         endDate: true,
+        project: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         client: {
           select: {
             id: true,
@@ -49,6 +58,7 @@ export class ListSupportTicketsMessagesController {
           select: {
             id: true,
             message: true,
+            createdAt: true,
             user: {
               select: {
                 id: true,
@@ -84,6 +94,10 @@ export class ListSupportTicketsMessagesController {
       },
     });
 
-    return ticket;
+    const endDate = format(ticket?.endDate || 0, "yyyy-MM-dd");
+    return {
+      ...ticket,
+      endDate,
+    };
   }
 }

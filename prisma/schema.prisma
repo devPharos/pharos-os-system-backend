@@ -281,6 +281,7 @@ model Support {
   title          String
   startDate      DateTime?
   endDate        DateTime
+  helperTopic    SupportHelper   @default(Desenvolvimento)
   status         SupportStatus   @default(NaoIniciado)
   priority       SupportPriority @default(Media)
 
@@ -306,6 +307,14 @@ enum SupportPriority {
   Alta
   Media
   Baixa
+}
+
+enum SupportHelper {
+  Desenvolvimento
+  Suporte
+  Infraestrutura
+  Modulos
+  Faturamento
 }
 
 enum SupportStatus {
