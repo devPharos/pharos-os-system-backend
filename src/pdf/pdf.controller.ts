@@ -4,9 +4,14 @@ import { PdfService } from "./pdf.service";
 import { PrismaService } from "src/prisma/prisma.service";
 
 import { z } from "zod";
+import { parseISO } from "date-fns";
 
 const getReportPDFSchema = z.object({
-  collaboratorId: z.string().uuid(),
+  clientid: z.optional(z.string().uuid().nullable()),
+  collaboratorid: z.optional(z.string().uuid().nullable()),
+  projectid: z.optional(z.string().uuid().nullable()),
+  startdate: z.optional(z.string()),
+  enddate: z.optional(z.string()),
 });
 
 type GetReportPDFSchema = z.infer<typeof getReportPDFSchema>;
@@ -23,36 +28,33 @@ export class PdfController {
     @Res() res: Response,
     @Headers() header: GetReportPDFSchema,
   ): Promise<void> {
-    const { collaboratorId } = header;
+    const { clientid, collaboratorid, enddate, projectid, startdate } = header;
 
-    const serviceOrders: {
-      date: Date;
-      startDate: Date;
-      endDate: Date;
-      client: {
-        fantasyName: string;
-      };
-      collaborator: {
-        name: string;
-        lastName: string;
-        value: string;
-      };
-      serviceOrderExpenses: {
-        value: string;
-      }[];
-    }[] = await this.prisma.serviceOrder.findMany({
+    const serviceOrders = await this.prisma.serviceOrder.findMany({
       where: {
-        collaboratorId,
-        AND: {
-          startDate: {
-            gte: "2023-10-01T00:00:00.000Z",
-            lte: "2023-10-31T00:00:00.000Z",
+        OR: [
+          {
+            clientId: clientid || undefined,
+            collaboratorId: {
+              equals: collaboratorid || undefined,
+            },
+            serviceOrderDetails: {
+              every: {
+                projectId: {
+                  equals: projectid || undefined,
+                },
+              },
+            },
+            startDate: {
+              gte: startdate ? parseISO(startdate) : undefined,
+              lte: enddate ? parseISO(enddate) : undefined,
+            },
+            endDate: {
+              gte: startdate ? parseISO(startdate) : undefined,
+              lte: enddate ? parseISO(enddate) : undefined,
+            },
           },
-          endDate: {
-            gte: "2023-10-01T00:00:00.000Z",
-            lte: "2023-10-31T00:00:00.000Z",
-          },
-        },
+        ],
       },
       select: {
         date: true,

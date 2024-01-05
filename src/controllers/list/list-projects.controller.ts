@@ -33,13 +33,18 @@ export class ListProjectsController {
       where: {
         OR: [
           {
-            clientId: client?.id,
-            coordinatorId: collaborator?.id,
+            coordinatorId: {
+              equals: collaborator?.id,
+            },
+          },
+          {
+            clientId: {
+              equals: client?.id,
+            },
           },
         ],
       },
     });
-
     return projects;
   }
 }
