@@ -54,6 +54,7 @@
     "typescript": "^5.2.0"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node prisma/seed.ts",
+    "gabi": "ts-node prisma/seed/gabi-user.seed.ts"
   }
 }
