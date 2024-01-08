@@ -12,7 +12,11 @@ async function bootstrap() {
 
   app.use(
     cors({
-      origin: ["http://localhost:3000", "https://pharos-os-system.netlify.app"], // Replace with your frontend's URL
+      origin: [
+        "http://localhost:3000",
+        "https://pharos-os-system.netlify.app",
+        "https://app.pharosit.com.br/",
+      ], // Replace with your frontend's URL
       methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
       credentials: true, // This option is important for handling cookies and authentication headers
     }),
