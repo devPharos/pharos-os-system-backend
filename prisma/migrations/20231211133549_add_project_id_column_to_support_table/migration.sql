@@ -5,7 +5,7 @@
 
 */
 -- AlterTable
-ALTER TABLE `support` ADD COLUMN `projectId` VARCHAR(191) NOT NULL;
+ALTER TABLE `Support` ADD COLUMN `projectId` VARCHAR(191) NOT NULL;
 
 -- AddForeignKey
 ALTER TABLE `Support` ADD CONSTRAINT `Support_projectId_fkey` FOREIGN KEY (`projectId`) REFERENCES `projects`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
