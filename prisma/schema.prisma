@@ -129,12 +129,6 @@ model Client {
   number         String
   complement     String?
   cep            String
-  bank           String
-  agency         String
-  agencyDigit    String?        @map("agency_digit")
-  account        String
-  accountDigit   String?        @map("account_digit")
-  pixKey         String?        @map("pix_key")
   active         Boolean?       @default(true)
   company        Company        @relation(fields: [companyId], references: [id])
   user           User?          @relation(fields: [userId], references: [id])

@@ -16,12 +16,6 @@ const updateClientBodySchema = z.object({
   number: z.string(),
   complement: z.string(),
   cep: z.string(),
-  bank: z.string(),
-  agency: z.string(),
-  agencyDigit: z.string().max(1),
-  account: z.string(),
-  accountDigit: z.string().max(1),
-  pixKey: z.string(),
 });
 
 type UpdateClientBodySchema = z.infer<typeof updateClientBodySchema>;
@@ -34,12 +28,7 @@ export class UpdateClientController {
   @HttpCode(201)
   async handle(@Body() body: UpdateClientBodySchema) {
     const {
-      account,
-      accountDigit,
       address,
-      agency,
-      agencyDigit,
-      bank,
       businessName,
       cep,
       city,
@@ -50,19 +39,13 @@ export class UpdateClientController {
       neighborhood,
       number,
       phone,
-      pixKey,
       state,
     } = body;
 
     await this.prisma.client.update({
       where: { cnpj },
       data: {
-        account,
-        accountDigit,
         address,
-        agency,
-        agencyDigit,
-        bank,
         businessName,
         cep,
         city,
@@ -72,7 +55,6 @@ export class UpdateClientController {
         neighborhood,
         number,
         phone,
-        pixKey,
         state,
       },
     });
