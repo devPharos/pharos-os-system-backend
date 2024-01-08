@@ -8,7 +8,7 @@ async function main() {
     where: { email: "gabriela@pharosit.com.br" },
     update: {},
     create: {
-      email: "email@pharosit.com",
+      email: "gabriela@pharosit.com.br",
       password: hashedPassword,
       group: {
         connect: { id: 1 },
