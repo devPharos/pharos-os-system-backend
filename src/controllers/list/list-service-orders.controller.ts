@@ -59,113 +59,73 @@ export class ListServiceOrdersController {
       date: string;
     }[] = [];
 
-    serviceOrdersDates.forEach((os) => {
-      const formattedDate = format(os.startDate, "MMMM - yyyy");
-      const dateAlreadyExists = dates.find(
-        (date) => date.formattedDate === formattedDate,
+    if (
+      serviceOrdersDates?.length !== 0 ||
+      serviceOrdersSupervisedByMeDates?.length !== 0
+    ) {
+      serviceOrdersDates.forEach((os) => {
+        const formattedDate = format(os.startDate, "MMMM - yyyy");
+        const dateAlreadyExists = dates.find(
+          (date) => date.formattedDate === formattedDate,
+        );
+
+        if (!dateAlreadyExists) {
+          dates.push({
+            formattedDate,
+            date: os.startDate.toISOString(),
+          });
+        }
+      });
+
+      serviceOrdersSupervisedByMeDates.forEach((os) => {
+        const formattedDate = format(os.startDate, "MMMM - yyyy");
+        const dateAlreadyExists = dates.find(
+          (date) => date.formattedDate === formattedDate,
+        );
+
+        if (!dateAlreadyExists) {
+          dates.push({
+            formattedDate,
+            date: os.startDate.toISOString(),
+          });
+        }
+      });
+
+      const actualMonth = getMonth(new Date());
+      const actualYear = getYear(new Date());
+      const hasOsThisMonth = dates.find(
+        (date) =>
+          getMonth(parseISO(date.date)) === actualMonth &&
+          getYear(parseISO(date.date)) === actualYear,
       );
 
-      if (!dateAlreadyExists) {
-        dates.push({
-          formattedDate,
-          date: os.startDate.toISOString(),
-        });
-      }
-    });
+      const defaultDate = hasOsThisMonth || dates[0];
+      const date = filterdate || defaultDate.date;
 
-    serviceOrdersSupervisedByMeDates.forEach((os) => {
-      const formattedDate = format(os.startDate, "MMMM - yyyy");
-      const dateAlreadyExists = dates.find(
-        (date) => date.formattedDate === formattedDate,
-      );
+      const month = getMonth(new Date(date)) + 1;
+      const year = getYear(new Date(date));
 
-      if (!dateAlreadyExists) {
-        dates.push({
-          formattedDate,
-          date: os.startDate.toISOString(),
-        });
-      }
-    });
-
-    const actualMonth = getMonth(new Date());
-    const actualYear = getYear(new Date());
-    const hasOsThisMonth = dates.find(
-      (date) =>
-        getMonth(parseISO(date.date)) === actualMonth &&
-        getYear(parseISO(date.date)) === actualYear,
-    );
-
-    const defaultDate = hasOsThisMonth || dates[0];
-    const date = filterdate || defaultDate.date;
-
-    const month = getMonth(new Date(date)) + 1;
-
-    const serviceOrders = await this.prisma.serviceOrder.findMany({
-      where: {
-        collaboratorId: collaborator?.id,
-        AND: {
-          startDate: {
-            gte: new Date(2023, month - 1, 1),
-            lt: new Date(2023, month, 1),
-          },
-          endDate: {
-            gte: new Date(2023, month - 1, 1),
-            lt: new Date(2023, month, 1),
-          },
-        },
-      },
-      select: {
-        id: true,
-        clientId: true,
-        status: true,
-        startDate: true,
-        endDate: true,
-        date: true,
-        collaborator: {
-          select: {
-            name: true,
-            lastName: true,
-            supervisorId: true,
-            id: true,
-          },
-        },
-        client: {
-          select: {
-            fantasyName: true,
-            cnpj: true,
-          },
-        },
-      },
-    });
-
-    const serviceOrdersSupervisedByMe = await this.prisma.serviceOrder.findMany(
-      {
+      const serviceOrders = await this.prisma.serviceOrder.findMany({
         where: {
-          collaborator: {
-            supervisorId: collaborator?.id,
-          },
-          AND: {
-            startDate: {
-              gte: new Date(2023, month - 1, 1),
-              lt: new Date(2023, month, 1),
+          collaboratorId: collaborator?.id,
+          AND: [
+            {
+              startDate: {
+                gte: new Date(year, month - 1, 1),
+                lt: new Date(year, month - 1, 31),
+              },
             },
-            endDate: {
-              gte: new Date(2023, month - 1, 1),
-              lt: new Date(2023, month, 1),
+            {
+              endDate: {
+                gte: new Date(year, month - 1, 1),
+                lt: new Date(year, month - 1, 31),
+              },
             },
-            status: {
-              not: "Rascunho",
-            },
-          },
+          ],
         },
         select: {
           id: true,
-          client: {
-            select: {
-              fantasyName: true,
-              cnpj: true,
-            },
-          },
+          clientId: true,
           status: true,
           startDate: true,
           endDate: true,
@@ -178,16 +138,67 @@ export class ListServiceOrdersController {
               id: true,
             },
           },
+          client: {
+            select: {
+              fantasyName: true,
+              cnpj: true,
+            },
+          },
         },
-      },
-    );
+      });
 
-    return {
-      serviceOrders,
-      serviceOrdersSupervisedByMe,
-      defaultDate,
-      date: defaultDate.date,
-      formattedDate: defaultDate.formattedDate,
-    };
+      const serviceOrdersSupervisedByMe =
+        await this.prisma.serviceOrder.findMany({
+          where: {
+            collaborator: {
+              supervisorId: collaborator?.id,
+            },
+            AND: {
+              startDate: {
+                gte: new Date(year, month - 1, 1),
+                lt: new Date(year, month, 1),
+              },
+              endDate: {
+                gte: new Date(year, month - 1, 1),
+                lt: new Date(year, month, 1),
+              },
+              status: {
+                not: "Rascunho",
+              },
+            },
+          },
+          select: {
+            id: true,
+            client: {
+              select: {
+                fantasyName: true,
+                cnpj: true,
+              },
+            },
+            status: true,
+            startDate: true,
+            endDate: true,
+            date: true,
+            collaborator: {
+              select: {
+                name: true,
+                lastName: true,
+                supervisorId: true,
+                id: true,
+              },
+            },
+          },
+        });
+
+      return {
+        serviceOrders,
+        serviceOrdersSupervisedByMe,
+        defaultDate,
+        date: defaultDate.date,
+        formattedDate: defaultDate.formattedDate,
+      };
+    } else {
+      return null;
+    }
   }
 }

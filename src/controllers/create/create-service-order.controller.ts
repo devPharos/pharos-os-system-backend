@@ -1,4 +1,11 @@
-import { Body, Controller, HttpCode, Post, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  ConflictException,
+  Controller,
+  HttpCode,
+  Post,
+  UseGuards,
+} from "@nestjs/common";
 import { differenceInHours } from "date-fns";
 import { CurrentUser } from "src/auth/current-user.decorator";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
@@ -79,6 +86,42 @@ export class CreateServiceOrderController {
       parseDate(endDate, date),
       parseDate(startDate, date),
     ).toString();
+
+    const serviceOrderWithSameHour = await this.prisma.serviceOrder.findMany({
+      where: {
+        OR: [
+          {
+            startDate: parseDate(startDate, date),
+            endDate: parseDate(endDate, date),
+          },
+        ],
+      },
+    });
+
+    const serviceOrderDetailWithSameHour = serviceOrderDetails.some(
+      async (detail) => {
+        const hasSameHour = await this.prisma.serviceOrderDetails.findMany({
+          where: {
+            OR: [
+              {
+                startDate: parseDate(detail.startDate, date),
+                endDate: parseDate(detail.endDate, date),
+              },
+            ],
+          },
+        });
+
+        if (hasSameHour) {
+          return true;
+        }
+
+        return false;
+      },
+    );
+
+    if (serviceOrderWithSameHour || serviceOrderDetailWithSameHour) {
+      throw new ConflictException("Ja existe uma OS nesse horário");
+    }
 
     const serviceOrder = await this.prisma.serviceOrder.create({
       data: {
