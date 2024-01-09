@@ -25,12 +25,6 @@ const createClientBodySchema = z.object({
   number: z.string(),
   complement: z.string().optional(),
   cep: z.string(),
-  bank: z.string(),
-  agency: z.string(),
-  agencyDigit: z.string().max(1).optional(),
-  account: z.string(),
-  accountDigit: z.string().max(1).optional(),
-  pixKey: z.string().optional(),
 });
 
 type CreateClientBodySchema = z.infer<typeof createClientBodySchema>;
@@ -46,12 +40,7 @@ export class CreateClientController {
     @Body() body: CreateClientBodySchema,
   ) {
     const {
-      account,
-      accountDigit,
       address,
-      agency,
-      agencyDigit,
-      bank,
       businessName,
       cep,
       city,
@@ -62,7 +51,6 @@ export class CreateClientController {
       neighborhood,
       number,
       phone,
-      pixKey,
       state,
     } = body;
 
@@ -88,12 +76,7 @@ export class CreateClientController {
 
     await this.prisma.client.create({
       data: {
-        account,
-        accountDigit,
         address,
-        agency,
-        agencyDigit,
-        bank,
         businessName,
         cep,
         city,
@@ -104,7 +87,6 @@ export class CreateClientController {
         neighborhood,
         number,
         phone,
-        pixKey,
         state,
         company: {
           connect: { id: currentCompany?.id },
