@@ -94,12 +94,18 @@ export class CreateServiceOrderController {
           OR: [
             {
               startDate: {
-                gte: parseDate(startDate, date),
-                lte: parseDate(endDate, date),
+                lte: parseDate(startDate, date),
               },
               endDate: {
                 gte: parseDate(startDate, date),
+              },
+            },
+            {
+              startDate: {
                 lte: parseDate(endDate, date),
+              },
+              endDate: {
+                gte: parseDate(endDate, date),
               },
             },
           ],
@@ -107,39 +113,7 @@ export class CreateServiceOrderController {
       },
     });
 
-    const serviceOrderDetailWithSameHour = serviceOrderDetails.some(
-      async (detail) => {
-        const hasSameHour = await this.prisma.serviceOrderDetails.findMany({
-          where: {
-            AND: {
-              serviceOrder: {
-                collaboratorId: collaborator?.id,
-              },
-              OR: [
-                {
-                  startDate: {
-                    gte: parseDate(detail.startDate, date),
-                    lte: parseDate(detail.endDate, date),
-                  },
-                  endDate: {
-                    gte: parseDate(detail.startDate, date),
-                    lte: parseDate(detail.endDate, date),
-                  },
-                },
-              ],
-            },
-          },
-        });
-
-        if (hasSameHour) {
-          return true;
-        }
-
-        return false;
-      },
-    );
-
-    if (serviceOrderWithSameHour || serviceOrderDetailWithSameHour) {
+    if (serviceOrderWithSameHour.length !== 0) {
       throw new ConflictException("Ja existe uma OS nesse horário");
     }
 
