@@ -89,12 +89,21 @@ export class CreateServiceOrderController {
 
     const serviceOrderWithSameHour = await this.prisma.serviceOrder.findMany({
       where: {
-        OR: [
-          {
-            startDate: parseDate(startDate, date),
-            endDate: parseDate(endDate, date),
-          },
-        ],
+        AND: {
+          collaboratorId: collaborator?.id,
+          OR: [
+            {
+              startDate: {
+                gte: parseDate(startDate, date),
+                lte: parseDate(endDate, date),
+              },
+              endDate: {
+                gte: parseDate(startDate, date),
+                lte: parseDate(endDate, date),
+              },
+            },
+          ],
+        },
       },
     });
 
@@ -102,12 +111,23 @@ export class CreateServiceOrderController {
       async (detail) => {
         const hasSameHour = await this.prisma.serviceOrderDetails.findMany({
           where: {
-            OR: [
-              {
-                startDate: parseDate(detail.startDate, date),
-                endDate: parseDate(detail.endDate, date),
+            AND: {
+              serviceOrder: {
+                collaboratorId: collaborator?.id,
               },
-            ],
+              OR: [
+                {
+                  startDate: {
+                    gte: parseDate(detail.startDate, date),
+                    lte: parseDate(detail.endDate, date),
+                  },
+                  endDate: {
+                    gte: parseDate(detail.startDate, date),
+                    lte: parseDate(detail.endDate, date),
+                  },
+                },
+              ],
+            },
           },
         });
 
