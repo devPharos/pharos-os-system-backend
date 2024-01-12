@@ -32,6 +32,8 @@ export class GetUserDataController {
       companyId: currentUser?.companyId,
       collaboratorId: collaborator?.id,
       clientId: client?.id,
+      name: collaborator?.name,
+      fantasyName: client?.fantasyName,
     };
   }
 }
