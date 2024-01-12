@@ -15,7 +15,7 @@ import { z } from "zod";
 const createCollaboratorBodySchema = z.object({
   name: z.string(),
   lastName: z.string(),
-  supervisorId: z.string().uuid().optional(),
+  supervisorId: z.string().uuid().optional().nullable(),
   cnpj: z.string(),
   phone: z.string(),
   country: z.string(),
