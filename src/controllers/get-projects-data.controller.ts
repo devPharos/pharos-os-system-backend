@@ -9,6 +9,29 @@ const getProjectsBodySchema = z.object({
 
 type GetProjectsBodySchema = z.infer<typeof getProjectsBodySchema>;
 
+interface Project {
+  clientId: string;
+  collaborator: {
+    id: string;
+    name: string;
+  };
+  companyId: string;
+  coordinatorId: string;
+  deliveryForecast: Date;
+  endDate: Date | null;
+  hourValue: string;
+  hoursBalance: string | null;
+  hoursForecast: string;
+  name: string;
+  serviceOrderDetails: { serviceOrder: { totalHours: string } }[];
+  startDate: Date;
+  status: string;
+}
+
+interface BilledProject extends Project {
+  hoursToBeBilled: number;
+}
+
 @Controller()
 @UseGuards(JwtAuthGuard)
 export class GetProjectsDataController {
@@ -17,14 +40,55 @@ export class GetProjectsDataController {
   @HttpCode(201)
   async handle(@Body() body: GetProjectsBodySchema) {
     const { clientId } = body;
-    const projects = await this.prisma.project.findMany({
+
+    const projects: Project[] = await this.prisma.project.findMany({
       where: {
         clientId,
       },
+      include: {
+        collaborator: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        serviceOrderDetails: {
+          where: {
+            serviceOrder: {
+              status: {
+                equals: "Validado",
+              },
+            },
+          },
+          select: {
+            serviceOrder: {
+              select: {
+                totalHours: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    let hoursToBeBilled = 0;
+
+    const newProjects: BilledProject[] = [];
+
+    projects.forEach((project) => {
+      project.serviceOrderDetails.forEach((os) => {
+        hoursToBeBilled += Number(os.serviceOrder.totalHours);
+      });
+      const newProject = {
+        ...project,
+        hoursToBeBilled,
+      };
+
+      newProjects.push(newProject);
     });
 
     return {
-      projects,
+      projects: newProjects,
     };
   }
 }

@@ -81,7 +81,11 @@ export class PdfController {
       },
     });
 
-    const pdfPath = await this.pdfService.generatePdf(serviceOrders);
+    const pdfPath = await this.pdfService.generatePdf({
+      serviceOrders,
+      startDate: parseISO(startdate || ""),
+      endDate: parseISO(enddate || ""),
+    });
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", "attachment; filename=output.pdf");

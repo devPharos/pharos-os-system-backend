@@ -56,6 +56,7 @@ model User {
   company        Company          @relation(fields: [companyId], references: [id])
   group          UserGroups       @relation(fields: [groupId], references: [id])
   SupportMessage SupportMessage[]
+  ServiceOrder   ServiceOrder[]
 
   @@index([companyId], map: "users_company_id_fkey")
   @@index([groupId], map: "users_group_id_fkey")
@@ -129,12 +130,14 @@ model Client {
   number         String
   complement     String?
   cep            String
+  paymentDate    String?        @db.VarChar(2)
   active         Boolean?       @default(true)
   company        Company        @relation(fields: [companyId], references: [id])
   user           User?          @relation(fields: [userId], references: [id])
   projects       Project[]
   servicesOrders ServiceOrder[]
   Support        Support[]
+  Closing        Closing[]
 
   @@index([companyId], map: "clients_company_id_fkey")
   @@map("clients")
@@ -161,6 +164,7 @@ model Project {
   serviceOrderDetails  ServiceOrderDetails[]
   serviceOrderExpenses ServiceOrderExpenses[]
   Support              Support[]
+  Closing              Closing[]
 
   @@index([clientId], map: "projects_client_id_fkey")
   @@index([companyId], map: "projects_company_id_fkey")
@@ -201,19 +205,25 @@ model ProjectService {
 }
 
 model ServiceOrder {
-  id                   String                 @id @default(uuid())
-  companyId            String                 @map("company_id")
-  collaboratorId       String                 @map("collaborator_id")
-  clientId             String                 @map("client_id")
-  date                 DateTime               @default(now())
-  startDate            DateTime               @map("start_date")
-  endDate              DateTime               @map("end_date")
-  totalHours           String                 @map("total_hours")
-  remote               Boolean?               @default(false)
-  status               OsStatus               @default(Aberto)
-  client               Client                 @relation(fields: [clientId], references: [id])
-  collaborator         Collaborator           @relation(fields: [collaboratorId], references: [id])
-  company              Company                @relation(fields: [companyId], references: [id])
+  id                 String       @id @default(uuid())
+  companyId          String       @map("company_id")
+  collaboratorId     String       @map("collaborator_id")
+  clientId           String       @map("client_id")
+  monthly_closing_id String?
+  date               DateTime     @default(now())
+  startDate          DateTime     @map("start_date")
+  endDate            DateTime     @map("end_date")
+  totalHours         String       @map("total_hours")
+  remote             Boolean?     @default(false)
+  status             OsStatus     @default(Aberto)
+  validated_by       String?
+  validated_at       DateTime?
+  client             Client       @relation(fields: [clientId], references: [id])
+  collaborator       Collaborator @relation(fields: [collaboratorId], references: [id])
+  company            Company      @relation(fields: [companyId], references: [id])
+  user               User?        @relation(fields: [validated_by], references: [id])
+  closing            Closing?     @relation(fields: [monthly_closing_id], references: [id])
+
   serviceOrderDetails  ServiceOrderDetails[]
   serviceOrderExpenses ServiceOrderExpenses[]
 
@@ -286,6 +296,25 @@ model Support {
   SupportMessage SupportMessage[]
 }
 
+model Closing {
+  id                  String        @id @default(uuid())
+  clientId            String
+  projectId           String
+  period              String        @db.VarChar(6)
+  totalValidatedHours String
+  totalValue          String
+  expensesTotalValue  String
+  taxTotalValue       String
+  status              ClosingStatus @default(Aberto)
+  paymentDate         String        @db.VarChar(2)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  client       Client         @relation(fields: [clientId], references: [id])
+  project      Project        @relation(fields: [projectId], references: [id])
+  ServiceOrder ServiceOrder[]
+}
+
 model SupportMessage {
   id        String   @id @default(uuid())
   userId    String
@@ -295,6 +324,12 @@ model SupportMessage {
 
   user    User    @relation(fields: [userId], references: [id])
   support Support @relation(fields: [supportId], references: [id])
+}
+
+enum ClosingStatus {
+  Aberto
+  Cancelado
+  Pago
 }
 
 enum SupportPriority {
