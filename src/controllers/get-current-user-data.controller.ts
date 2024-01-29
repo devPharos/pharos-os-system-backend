@@ -8,6 +8,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 @UseGuards(JwtAuthGuard)
 export class GetUserDataController {
   constructor(private prisma: PrismaService) {}
+
   @Get("/data")
   @HttpCode(201)
   async handle(@CurrentUser() user: UserPayload) {
@@ -27,6 +28,12 @@ export class GetUserDataController {
       },
     });
 
+    const file = await this.prisma.file.findUnique({
+      where: {
+        id: collaborator?.fileId || undefined,
+      },
+    });
+
     return {
       userId: currentUser?.id,
       companyId: currentUser?.companyId,
@@ -34,6 +41,10 @@ export class GetUserDataController {
       clientId: client?.id,
       name: collaborator?.name,
       fantasyName: client?.fantasyName,
+      url:
+        file?.url +
+        "/file/pharosit-miscelaneous/" +
+        file?.name.replace(/ /g, "%20"),
     };
   }
 }

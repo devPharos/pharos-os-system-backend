@@ -9,7 +9,6 @@ import { CreateProjectController } from "./controllers/create/create-project.con
 import { CreateUserController } from "./controllers/create/create-user.controller";
 import { UpdateCollaboratorController } from "./controllers/update/update-collaborator.controller";
 import { CreateClientController } from "./controllers/create/create-client.controller";
-import { CreateFileController } from "./controllers/create/create-file.controller";
 import { CreateProjectExpensesController } from "./controllers/create/create-project-expenses.controller";
 import { CreateProjectServiceController } from "./controllers/create/create-project-service.controller";
 import { CreateServiceOrderDetailsController } from "./controllers/create/create-service-order-details.controller";
@@ -58,6 +57,9 @@ import { ListProjectsController } from "./controllers/list/list-projects.control
 import { ListProjectCollaboratorsController } from "./controllers/list/list-project-collaborators.controller";
 import { UpdateSupportTicketController } from "./controllers/update/update-ticket-info.controller";
 import { ListHomeDataController } from "./controllers/list/list-home-data.controller";
+import { ListClosingController } from "./controllers/list/list-closing.controller";
+import { UpdateClosingStatusController } from "./controllers/update/update-closing-status.controller";
+import { StorageModule } from "./storage/storage.module";
 
 @Module({
   imports: [
@@ -67,12 +69,13 @@ import { ListHomeDataController } from "./controllers/list/list-home-data.contro
     }),
     AuthModule,
     PdfModule,
+    StorageModule,
   ],
   controllers: [
+    UpdateClosingStatusController,
     AuthenticateUserController,
     CreateClientController,
     CreateCollaboratorController,
-    CreateFileController,
     CreateProjectExpensesController,
     CreateProjectServiceController,
     CreateProjectController,
@@ -81,6 +84,7 @@ import { ListHomeDataController } from "./controllers/list/list-home-data.contro
     CreateServiceOrderController,
     EditProfileController,
     CreateTicketMessageController,
+    ListClosingController,
     GetServiceOrderDataController,
     CreateSupportTicketController,
     GetClientDataController,

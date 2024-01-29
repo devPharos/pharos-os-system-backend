@@ -66,12 +66,13 @@ model User {
 model File {
   id                   String                 @id @default(uuid())
   companyId            String                 @map("company_id")
+  fileId               String                 @unique
   name                 String
   size                 String
-  key                  String
   url                  String
   company              Company                @relation(fields: [companyId], references: [id])
   ServiceOrderExpenses ServiceOrderExpenses[]
+  Collaborator         Collaborator[]
 
   @@index([companyId], map: "files_company_id_fkey")
   @@map("files")
@@ -82,6 +83,7 @@ model Collaborator {
   companyId    String  @map("company_id")
   userId       String? @unique @map("user_id")
   supervisorId String? @map("supervisor_id")
+  fileId       String? @unique
   name         String
   value        String  @default("0")
   lastName     String  @map("last_name")
@@ -104,6 +106,7 @@ model Collaborator {
 
   company                 Company        @relation(fields: [companyId], references: [id])
   user                    User?          @relation(fields: [userId], references: [id])
+  file                    File?          @relation(fields: [fileId], references: [id])
   supervisor              Collaborator?  @relation("Supervision", fields: [supervisorId], references: [id])
   supervisedCollaborators Collaborator[] @relation("Supervision")
   projects                Project[]
@@ -300,13 +303,14 @@ model Closing {
   id                  String        @id @default(uuid())
   clientId            String
   projectId           String
-  period              String        @db.VarChar(6)
   totalValidatedHours String
   totalValue          String
   expensesTotalValue  String
   taxTotalValue       String
   status              ClosingStatus @default(Aberto)
   paymentDate         String        @db.VarChar(2)
+  startDate           DateTime
+  endDate             DateTime
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
 

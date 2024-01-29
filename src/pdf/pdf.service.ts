@@ -4,7 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as PDFDocument from "pdfkit";
 
-interface ServiceOrderProps {
+export interface ServiceOrderProps {
   date: Date;
   startDate: Date;
   endDate: Date;
@@ -78,44 +78,61 @@ export class PdfService {
   async generateClosingPdf({
     serviceOrders,
     projectName,
-  }: closingPdfProps): Promise<pdfReturn> {
+  }: closingPdfProps): Promise<pdfReturn | undefined> {
     let ret: pdfReturn = {
       name: "",
       path: "",
     };
-    const pdfPath = path.resolve(__dirname, "output.pdf");
-    const doc = new PDFDocument();
-    const pathFile = fs.createWriteStream(pdfPath, {
-      encoding: "base64",
-    });
 
-    doc.pipe(pathFile);
+    try {
+      const pdfPath = `${path.resolve(
+        __dirname,
+        "..",
+        "..",
+        "..",
+        "temp",
+      )}/fechamento.pdf`;
 
-    doc.image("src/assets/logo-yellow.png", 50, undefined, {
-      align: "center",
-    });
-
-    doc
-      .font("Helvetica")
-      .fontSize(10)
-      .text(`Fechamento Projeto ${projectName}`, {
-        align: "center",
+      const doc = new PDFDocument();
+      const pathFile = fs.createWriteStream(pdfPath, {
+        encoding: "base64",
       });
 
-    const rows = await manipulateServiceOrders(serviceOrders);
+      doc.pipe(pathFile);
 
-    createTable(doc, rows);
+      // doc.image("src/assets/logo-yellow.png", 50, undefined, {
+      //   align: "center",
+      // });
 
-    doc.end();
+      // doc
+      //   .font("Helvetica")
+      //   .fontSize(10)
+      //   .text(`Fechamento Projeto ${projectName}`, {
+      //     align: "center",
+      //   });
 
-    pathFile.addListener("finish", () => {
-      ret = {
-        path: pdfPath,
-        name: "output.pdf",
-      };
-    });
+      // const rows = await manipulateServiceOrders(serviceOrders);
 
-    return ret;
+      // createTable(doc, rows);
+
+      doc.end();
+
+      pathFile.addListener("finish", () => {
+        console.log(1);
+        ret = {
+          path: pdfPath,
+          name: "fechamento.pdf",
+        };
+      });
+
+      console.log(2);
+
+      return ret;
+    } catch {
+      console.log("erro");
+
+      return ret;
+    }
   }
 }
 

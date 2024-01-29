@@ -50,7 +50,7 @@ export class ListServiceOrdersFiltersController {
       date: string;
     }[] = [];
 
-    serviceOrders.forEach((os) => {
+    serviceOrders.forEach((os: any) => {
       const formattedDate = format(os.startDate, "MMMM - yyyy");
       const dateAlreadyExists = dates.find(
         (date) => date.formattedDate === formattedDate,
@@ -64,7 +64,7 @@ export class ListServiceOrdersFiltersController {
       }
     });
 
-    serviceOrdersSupervisedByMe.forEach((os) => {
+    serviceOrdersSupervisedByMe.forEach((os: any) => {
       const formattedDate = format(os.startDate, "MMMM - yyyy");
       const dateAlreadyExists = dates.find(
         (date) => date.formattedDate === formattedDate,
