@@ -7,6 +7,6 @@
 
 */
 -- AlterTable
-ALTER TABLE `closing` DROP COLUMN `period`,
+ALTER TABLE `Closing` DROP COLUMN `period`,
     ADD COLUMN `endDate` DATETIME(3) NOT NULL,
     ADD COLUMN `startDate` DATETIME(3) NOT NULL;
