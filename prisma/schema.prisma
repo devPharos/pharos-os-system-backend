@@ -225,7 +225,7 @@ model ServiceOrder {
   collaborator       Collaborator @relation(fields: [collaboratorId], references: [id])
   company            Company      @relation(fields: [companyId], references: [id])
   user               User?        @relation(fields: [validated_by], references: [id])
-  closing            Closing?     @relation(fields: [monthly_closing_id], references: [id])
+  Closing            Closing?     @relation(fields: [monthly_closing_id], references: [id])
 
   serviceOrderDetails  ServiceOrderDetails[]
   serviceOrderExpenses ServiceOrderExpenses[]
