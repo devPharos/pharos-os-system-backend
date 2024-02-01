@@ -4,7 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as PDFDocument from "pdfkit";
 
-interface pdfProps {
+export interface ServiceOrderProps {
   date: Date;
   startDate: Date;
   endDate: Date;
@@ -21,15 +21,48 @@ interface pdfProps {
   }[];
 }
 
+interface pdfProps {
+  serviceOrders: ServiceOrderProps[];
+  startDate: Date;
+  endDate: Date;
+}
+
+interface closingPdfProps {
+  serviceOrders: ServiceOrderProps[];
+  projectName: string;
+}
+
+export interface pdfReturn {
+  path: string;
+  name: string;
+}
+
 @Injectable()
 export class PdfService {
-  async generatePdf(serviceOrders: pdfProps[]): Promise<string> {
+  async generatePdf({
+    serviceOrders,
+    startDate,
+    endDate,
+  }: pdfProps): Promise<string> {
     const pdfPath = path.resolve(__dirname, "output.pdf");
     const doc = new PDFDocument();
 
     doc.image("src/assets/logo-yellow.png", 50, undefined, {
       align: "center",
     });
+
+    doc
+      .font("Helvetica")
+      .fontSize(10)
+      .text(
+        `Ordens de Serviço de ${format(startDate, "dd/MM/yyyy")} a ${format(
+          endDate,
+          "dd/MM/yyyy",
+        )}`,
+        {
+          align: "center",
+        },
+      );
 
     const rows = await manipulateServiceOrders(serviceOrders);
 
@@ -41,10 +74,71 @@ export class PdfService {
 
     return pdfPath;
   }
+
+  async generateClosingPdf({
+    serviceOrders,
+    projectName,
+  }: closingPdfProps): Promise<pdfReturn | undefined> {
+    let ret: pdfReturn = {
+      name: "",
+      path: "",
+    };
+
+    try {
+      const pdfPath = `${path.resolve(
+        __dirname,
+        "..",
+        "..",
+        "..",
+        "temp",
+      )}/fechamento.pdf`;
+
+      const doc = new PDFDocument();
+      const pathFile = fs.createWriteStream(pdfPath, {
+        encoding: "base64",
+      });
+
+      doc.pipe(pathFile);
+
+      // doc.image("src/assets/logo-yellow.png", 50, undefined, {
+      //   align: "center",
+      // });
+
+      // doc
+      //   .font("Helvetica")
+      //   .fontSize(10)
+      //   .text(`Fechamento Projeto ${projectName}`, {
+      //     align: "center",
+      //   });
+
+      // const rows = await manipulateServiceOrders(serviceOrders);
+
+      // createTable(doc, rows);
+
+      doc.end();
+
+      pathFile.addListener("finish", () => {
+        console.log(1);
+        ret = {
+          path: pdfPath,
+          name: "fechamento.pdf",
+        };
+      });
+
+      console.log(2);
+
+      return ret;
+    } catch {
+      console.log("erro");
+
+      return ret;
+    }
+  }
 }
 
 async function manipulateServiceOrders(
-  serviceOrders: pdfProps[],
+  serviceOrders: ServiceOrderProps[],
+  closing?: boolean,
 ): Promise<string[][]> {
   const newOsArr: string[][] = [
     [
@@ -75,45 +169,100 @@ async function manipulateServiceOrders(
     newArr.push(
       formattedDate,
       os.client.fantasyName,
-      os.collaborator.name + os.collaborator.lastName,
+      os.collaborator.name + " " + os.collaborator.lastName,
       formattedStateDate,
       formattedEndDate,
-      totalHours.toString(),
-      `${value.toString()},00`,
-      `${expenses.toString()},00`,
+      `${totalHours.toString()}h`,
+      `R$ ${value.toString()},00`,
+      `R$ ${expenses.toString()},00`,
     );
 
     newOsArr.push(newArr);
   });
 
   const totalArr: string[] = [];
+  const totalTaxArr: string[] = [];
+  const totalValueArr: string[] = [];
   let totalValue: number = 0;
   let totalHours: number = 0;
   let totalExpenses: number = 0;
 
-  for (let i = 1; i < newOsArr.length; i++) {
-    totalArr.splice(0, totalArr.length);
-    const hours = parseInt(newOsArr[i][5].split(",")[0]);
-    const value = parseInt(newOsArr[i][6].split(",")[0]);
-    const expenses = parseInt(newOsArr[i][7].split(",")[0]);
-    totalValue += value;
-    totalHours += hours;
-    totalExpenses += expenses;
+  if (!closing) {
+    for (let i = 1; i < newOsArr.length; i++) {
+      totalArr.splice(0, totalArr.length);
+      const hours = parseInt(newOsArr[i][5].split("h")[0]);
+      const value = newOsArr[i][6].match(/\d+/);
+      const expenses = newOsArr[i][7].match(/\d+/);
+      totalValue += value && value[0] ? parseInt(value[0]) : 0;
+      totalHours += hours;
+      totalExpenses += expenses && expenses[0] ? parseInt(expenses[0]) : 0;
 
-    totalArr.push(
+      totalArr.push(
+        "Total",
+        "",
+        "",
+        "",
+        "",
+        `${totalHours.toString()}h`,
+        `R$ ${totalValue.toString()},00`,
+        `R$ ${totalExpenses.toString()},00`,
+      );
+    }
+  }
+
+  if (closing) {
+    for (let i = 1; i < newOsArr.length; i++) {
+      totalArr.splice(0, totalArr.length);
+      const hours = parseInt(newOsArr[i][5].split("h")[0]);
+      const value = newOsArr[i][6].match(/\d+/);
+      const expenses = newOsArr[i][7].match(/\d+/);
+      totalValue += value && value[0] ? parseInt(value[0]) : 0;
+      totalHours += hours;
+      totalExpenses += expenses && expenses[0] ? parseInt(expenses[0]) : 0;
+
+      totalArr.push(
+        "Total Atendimentos:",
+        "",
+        "",
+        "",
+        "",
+        `${totalHours.toString()}h`,
+        `R$ ${totalValue.toString()},00`,
+        `R$ ${totalExpenses.toString()},00`,
+      );
+    }
+    const value = totalArr[6].match(/\d+/);
+    const totalMainValue = value && value[0] ? parseInt(value[0]) : 0;
+    const totalTaxes = totalMainValue * 0.16;
+    const mainTotalValue = totalMainValue + totalTaxes;
+
+    totalTaxArr.push(
+      "Total de Impostos:",
       "",
       "",
       "",
       "",
       "",
-      totalHours.toString(),
-      totalValue.toString(),
-      totalExpenses.toString(),
+      `R$ ${totalTaxes.toString()},00`,
+      "",
+    );
+
+    totalValueArr.push(
+      "Total Geral:",
+      "",
+      "",
+      "",
+      "",
+      "",
+      `R$ ${mainTotalValue.toString()},00`,
+      "",
     );
   }
 
   const newOSIndex = newOsArr.length;
-  newOsArr.splice(newOSIndex, 0, totalArr);
+  closing
+    ? newOsArr.splice(newOSIndex, 0, totalArr, totalTaxArr, totalValueArr)
+    : newOsArr.splice(newOSIndex, 0, totalArr);
 
   return newOsArr;
 }
@@ -135,7 +284,7 @@ function createTable(doc: PDFKit.PDFDocument, rows: string[][]) {
         const textY = currentY + (20 - 10) / 2;
 
         doc.font("Helvetica-Bold");
-        doc.fillColor("#111111").fontSize(10).text(cell, currentX, textY, {
+        doc.fillColor("#111111").fontSize(8).text(cell, currentX, textY, {
           width: 100,
         });
         doc.font("Helvetica");
@@ -143,12 +292,12 @@ function createTable(doc: PDFKit.PDFDocument, rows: string[][]) {
         const textY = currentY + (20 - 8) / 2;
         const textX =
           index === 0
-            ? currentX + 10
+            ? currentX + 8
             : index !== 1 && index !== 2
               ? currentX + (40 - doc.widthOfString(cell)) / 2
               : currentX;
 
-        doc.fillColor("#111111").fontSize(8).text(cell, textX, textY, {
+        doc.fillColor("#111111").fontSize(6).text(cell, textX, textY, {
           width: 100,
         });
       }

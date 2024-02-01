@@ -1,10 +1,11 @@
-import { Controller, Get, Headers, Res } from "@nestjs/common";
+import { Controller, Get, Headers, Res, UseGuards } from "@nestjs/common";
 import { Response } from "express";
 import { PdfService } from "./pdf.service";
 import { PrismaService } from "src/prisma/prisma.service";
 
 import { z } from "zod";
 import { parseISO } from "date-fns";
+import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 
 const getReportPDFSchema = z.object({
   clientid: z.optional(z.string().uuid().nullable()),
@@ -17,6 +18,7 @@ const getReportPDFSchema = z.object({
 type GetReportPDFSchema = z.infer<typeof getReportPDFSchema>;
 
 @Controller("pdf")
+@UseGuards(JwtAuthGuard)
 export class PdfController {
   constructor(
     private readonly pdfService: PdfService,
@@ -81,7 +83,11 @@ export class PdfController {
       },
     });
 
-    const pdfPath = await this.pdfService.generatePdf(serviceOrders);
+    const pdfPath = await this.pdfService.generatePdf({
+      serviceOrders,
+      startDate: parseISO(startdate || ""),
+      endDate: parseISO(enddate || ""),
+    });
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", "attachment; filename=output.pdf");

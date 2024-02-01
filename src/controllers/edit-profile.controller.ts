@@ -5,6 +5,13 @@ import { UserPayload } from "src/auth/jwt.strategy";
 import { PrismaService } from "src/prisma/prisma.service";
 import { z } from "zod";
 
+const avatarImgFileSchema = z.object({
+  fileId: z.string(),
+  fileUrl: z.string().url(),
+  fileName: z.string(),
+  fileSize: z.string(),
+});
+
 const editProfileBodySchema = z.object({
   firstName: z.string().min(1),
   lastName: z.string().min(1),
@@ -13,6 +20,7 @@ const editProfileBodySchema = z.object({
   number: z.string().min(1),
   cep: z.string().min(1),
   complement: z.string().min(1),
+  file: avatarImgFileSchema.optional(),
 });
 
 type EditProfileBodySchema = z.infer<typeof editProfileBodySchema>;
@@ -27,8 +35,16 @@ export class EditProfileController {
     @CurrentUser() user: UserPayload,
     @Body() body: EditProfileBodySchema,
   ) {
-    const { address, cep, complement, firstName, lastName, number, phone } =
-      body;
+    const {
+      address,
+      cep,
+      complement,
+      firstName,
+      lastName,
+      number,
+      phone,
+      file,
+    } = body;
 
     const currentUser = await this.prisma.user.findUnique({
       where: { id: user.sub },
@@ -39,6 +55,33 @@ export class EditProfileController {
         userId: currentUser?.id,
       },
     });
+
+    let fileId = "";
+
+    if (file) {
+      const newFile = await this.prisma.file.upsert({
+        where: {
+          fileId: file.fileId,
+        },
+        create: {
+          fileId: file.fileId,
+          name: file.fileName,
+          size: file.fileSize,
+          url: file.fileUrl,
+          companyId: currentCollaborator?.companyId || "",
+        },
+        update: {
+          fileId: file.fileId,
+          name: file.fileName,
+          size: file.fileSize,
+          url: file.fileUrl,
+          companyId: currentCollaborator?.companyId || "",
+        },
+      });
+
+      fileId = newFile.id;
+    }
+
     await this.prisma.collaborator.update({
       where: {
         cnpj: currentCollaborator?.cnpj,
@@ -51,6 +94,7 @@ export class EditProfileController {
         lastName,
         number,
         phone,
+        fileId: fileId !== "" ? fileId : null,
       },
     });
   }

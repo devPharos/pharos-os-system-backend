@@ -14,8 +14,16 @@ import { ZodValidationPipe } from "src/pipes/zod-validation.pipe";
 import { PrismaService } from "src/prisma/prisma.service";
 import { z } from "zod";
 
+const serviceOrderProjectExpensesFile = z.object({
+  fileId: z.string(),
+  fileUrl: z.string().url(),
+  fileName: z.string(),
+  fileSize: z.string(),
+});
+
 const serviceOrderProjectExpenses = z.object({
   id: z.string().uuid(),
+  serviceOrderProjectExpensesFile: serviceOrderProjectExpensesFile.optional(),
   description: z.string(),
   value: z.string(),
 });
@@ -145,6 +153,22 @@ export class CreateServiceOrderController {
       });
 
       detail.project.projectsExpenses.map(async (expense) => {
+        let fileId = "";
+
+        if (expense.serviceOrderProjectExpensesFile) {
+          const file = await this.prisma.file.create({
+            data: {
+              fileId: expense.serviceOrderProjectExpensesFile?.fileId,
+              name: expense.serviceOrderProjectExpensesFile.fileName,
+              size: expense.serviceOrderProjectExpensesFile.fileSize,
+              url: expense.serviceOrderProjectExpensesFile.fileUrl,
+              companyId: collaborator?.companyId || "",
+            },
+          });
+
+          fileId = file.id;
+        }
+
         await this.prisma.serviceOrderExpenses.create({
           data: {
             value: expense.value,
@@ -152,6 +176,7 @@ export class CreateServiceOrderController {
             serviceOrderId: serviceOrder.id,
             projectId: detail.project.id,
             companyId: collaborator?.companyId || "",
+            fileId: fileId !== "" ? fileId : null,
           },
         });
       });
