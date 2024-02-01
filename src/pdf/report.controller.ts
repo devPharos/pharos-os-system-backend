@@ -160,7 +160,7 @@ export class ReportPdfController {
             },
           });
 
-          // return serviceOrders;
+          return serviceOrders;
         }
 
         const project = await this.prisma.project.findUnique({
