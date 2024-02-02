@@ -28,11 +28,15 @@ export class GetUserDataController {
       },
     });
 
-    const file = await this.prisma.file.findUnique({
-      where: {
-        id: collaborator?.fileId || undefined,
-      },
-    });
+    let file;
+
+    if (collaborator?.fileId) {
+      file = await this.prisma.file.findUnique({
+        where: {
+          id: collaborator?.fileId || undefined,
+        },
+      });
+    }
 
     return {
       userId: currentUser?.id,
@@ -42,9 +46,10 @@ export class GetUserDataController {
       name: collaborator?.name,
       fantasyName: client?.fantasyName,
       url:
+        file &&
         file?.url +
-        "/file/pharosit-miscelaneous/" +
-        file?.name.replace(/ /g, "%20"),
+          "/file/pharosit-miscelaneous/" +
+          file?.name.replace(/ /g, "%20"),
     };
   }
 }
