@@ -9,6 +9,7 @@ export const envSchema = z.object({
   STORAGE_BASE_URL: z.string().url(),
   EXPENSES_BUCKET_ID: z.string(),
   MISCELANEOUS_BUCKET_ID: z.string(),
+  SEND_GRID_KEY: z.string(),
 });
 
 export type Env = z.infer<typeof envSchema>;

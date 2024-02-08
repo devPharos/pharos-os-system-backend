@@ -15,9 +15,18 @@ export interface ServiceOrderProps {
     name: string;
     lastName: string;
     value: string;
+    userId?: string | null;
   };
   serviceOrderExpenses: {
     value: string;
+  }[];
+  serviceOrderDetails?: {
+    description?: string;
+    startDate?: Date;
+    endDate?: Date;
+    project?: {
+      name?: string;
+    };
   }[];
 }
 
@@ -25,11 +34,6 @@ interface pdfProps {
   serviceOrders: ServiceOrderProps[];
   startDate: Date;
   endDate: Date;
-}
-
-interface closingPdfProps {
-  serviceOrders: ServiceOrderProps[];
-  projectName: string;
 }
 
 export interface pdfReturn {
@@ -44,7 +48,7 @@ export class PdfService {
     startDate,
     endDate,
   }: pdfProps): Promise<string> {
-    const pdfPath = path.resolve(__dirname, "output.pdf");
+    const pdfPath = path.resolve(__dirname, "..", "..", "", "output.pdf");
     const doc = new PDFDocument();
 
     doc.image("src/assets/logo-yellow.png", 50, undefined, {
@@ -73,66 +77,6 @@ export class PdfService {
     doc.end();
 
     return pdfPath;
-  }
-
-  async generateClosingPdf({
-    serviceOrders,
-    projectName,
-  }: closingPdfProps): Promise<pdfReturn | undefined> {
-    let ret: pdfReturn = {
-      name: "",
-      path: "",
-    };
-
-    try {
-      const pdfPath = `${path.resolve(
-        __dirname,
-        "..",
-        "..",
-        "..",
-        "temp",
-      )}/fechamento.pdf`;
-
-      const doc = new PDFDocument();
-      const pathFile = fs.createWriteStream(pdfPath, {
-        encoding: "base64",
-      });
-
-      doc.pipe(pathFile);
-
-      // doc.image("src/assets/logo-yellow.png", 50, undefined, {
-      //   align: "center",
-      // });
-
-      // doc
-      //   .font("Helvetica")
-      //   .fontSize(10)
-      //   .text(`Fechamento Projeto ${projectName}`, {
-      //     align: "center",
-      //   });
-
-      // const rows = await manipulateServiceOrders(serviceOrders);
-
-      // createTable(doc, rows);
-
-      doc.end();
-
-      pathFile.addListener("finish", () => {
-        console.log(1);
-        ret = {
-          path: pdfPath,
-          name: "fechamento.pdf",
-        };
-      });
-
-      console.log(2);
-
-      return ret;
-    } catch {
-      console.log("erro");
-
-      return ret;
-    }
   }
 }
 

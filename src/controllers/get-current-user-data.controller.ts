@@ -45,6 +45,7 @@ export class GetUserDataController {
       clientId: client?.id,
       name: collaborator?.name,
       fantasyName: client?.fantasyName,
+      groupId: currentUser?.groupId,
       url:
         file &&
         file?.url +

@@ -8,13 +8,7 @@ import {
   Res,
   UseGuards,
 } from "@nestjs/common";
-import {
-  differenceInHours,
-  format,
-  getMonth,
-  getYear,
-  parseISO,
-} from "date-fns";
+import { differenceInHours, format, parseISO } from "date-fns";
 import { Response } from "express";
 import * as fs from "fs";
 import { resolve } from "path";
@@ -278,6 +272,7 @@ export class ReportPdfController {
                 name: true,
                 lastName: true,
                 value: true,
+                userId: true,
               },
             },
             startDate: true,
@@ -319,7 +314,7 @@ export class ReportPdfController {
         __dirname,
         "..",
         "..",
-        "..",
+        "",
         "temp",
       )}/${projectName}.pdf`;
 
@@ -347,6 +342,17 @@ export class ReportPdfController {
         projectHourValue,
       );
 
+      const collaborators: {
+        name: string;
+        lastName: string;
+        value: string;
+        userId?: string | null;
+      }[] = [];
+
+      serviceOrders.forEach((os) => {
+        collaborators.push(os.collaborator);
+      });
+
       createTable(doc, rows);
 
       doc.pipe(file);
@@ -356,6 +362,8 @@ export class ReportPdfController {
       ret = {
         path,
         pathName: projectName,
+        users: collaborators,
+        serviceOrders,
       };
 
       return ret;
@@ -373,7 +381,7 @@ export class ReportPdfController {
     const name = `${filename}.pdf`;
 
     return res.download(
-      `${resolve(__dirname, "..", "..", "..", "temp")}/${name}`,
+      `${resolve(__dirname, "..", "..", "", "temp")}/${name}`,
       name,
     );
   }
@@ -387,7 +395,7 @@ export class ReportPdfController {
     const name = `${filename}.pdf`;
 
     try {
-      fs.unlinkSync(`${resolve(__dirname, "..", "..", "..", "temp")}/${name}`);
+      fs.unlinkSync(`${resolve(__dirname, "..", "..", "", "temp")}/${name}`);
     } catch (err) {
       return res.status(401).json({ error: "Arquivo não pôde ser apagado." });
     }
