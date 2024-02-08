@@ -403,3 +403,5 @@ dist
 
 *.pem
 *.txt
+
+init-app-os.sh
