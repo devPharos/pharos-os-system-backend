@@ -60,6 +60,7 @@ import { ListHomeDataController } from "./controllers/list/list-home-data.contro
 import { ListClosingController } from "./controllers/list/list-closing.controller";
 import { UpdateClosingStatusController } from "./controllers/update/update-closing-status.controller";
 import { StorageModule } from "./storage/storage.module";
+import { EmailModule } from "./email/email.module";
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { StorageModule } from "./storage/storage.module";
     AuthModule,
     PdfModule,
     StorageModule,
+    EmailModule,
   ],
   controllers: [
     UpdateClosingStatusController,

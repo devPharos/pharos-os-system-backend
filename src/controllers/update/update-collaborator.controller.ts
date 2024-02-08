@@ -78,11 +78,7 @@ export class UpdateCollaboratorController {
         phone,
         pixKey,
         state,
-        supervisor: {
-          connect: {
-            id: supervisorId,
-          },
-        },
+        supervisorId: supervisorId || undefined,
       },
     });
   }

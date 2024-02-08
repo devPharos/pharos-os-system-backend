@@ -14,5 +14,12 @@
     "skipLibCheck": true,
     "strict": true,
     "strictNullChecks": true
-  }
+  },
+  "include": [
+    "src/**/*.ts",
+    "assets/**/*.png"
+  ],
+  "exclude": [
+    "dist"
+  ]
 }
