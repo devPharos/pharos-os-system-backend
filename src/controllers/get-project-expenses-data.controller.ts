@@ -1,10 +1,10 @@
-import { Body, Controller, Get, HttpCode, UseGuards } from "@nestjs/common";
+import { Controller, Get, Headers, HttpCode, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { PrismaService } from "src/prisma/prisma.service";
 import { z } from "zod";
 
 const getProjectsBodySchema = z.object({
-  projectId: z.string().uuid(),
+  projectid: z.string().uuid(),
 });
 
 type GetProjectsBodySchema = z.infer<typeof getProjectsBodySchema>;
@@ -15,11 +15,11 @@ export class GetProjectExpensesController {
   constructor(private prisma: PrismaService) {}
   @Get("/project-expenses")
   @HttpCode(201)
-  async handle(@Body() body: GetProjectsBodySchema) {
-    const { projectId } = body;
+  async handle(@Headers() header: GetProjectsBodySchema) {
+    const { projectid } = header;
     const projectExpenses = await this.prisma.projectExpenses.findMany({
       where: {
-        projectId,
+        projectId: projectid,
       },
     });
 
