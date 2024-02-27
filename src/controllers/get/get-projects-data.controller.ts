@@ -52,6 +52,12 @@ export class GetProjectsDataController {
             name: true,
           },
         },
+        client: {
+          select: {
+            id: true,
+            fantasyName: true,
+          },
+        },
         serviceOrderDetails: {
           where: {
             serviceOrder: {

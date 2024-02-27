@@ -7,7 +7,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 @UseGuards(JwtAuthGuard)
 export class GetCollaboratorsController {
   constructor(private prisma: PrismaService) {}
-  @Get()
+  @Get("no-access")
   @HttpCode(201)
   async handle() {
     const collaborators = await this.prisma.collaborator.findMany({
