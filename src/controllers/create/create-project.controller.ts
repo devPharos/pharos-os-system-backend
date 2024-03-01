@@ -1,4 +1,5 @@
 import { Body, Controller, HttpCode, Post, UseGuards } from "@nestjs/common";
+import { parseISO } from "date-fns";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { ZodValidationPipe } from "src/pipes/zod-validation.pipe";
 import { PrismaService } from "src/prisma/prisma.service";
@@ -20,14 +21,14 @@ const createProjectBodySchema = z.object({
   clientId: z.string().uuid(),
   coordinatorId: z.string().uuid(),
   name: z.string(),
-  startDate: z.coerce.date(),
-  endDate: z.coerce.date().optional(),
+  startDate: z.string(),
+  endDate: z.string().optional(),
   deliveryForecast: z.string(),
   hoursForecast: z.string(),
   hoursBalance: z.string().optional(),
   hourValue: z.string(),
-  projectExpenses: projectExpensesFormSchema.array(),
-  projectServices: projectServicesFormSchema.array(),
+  projectsExpenses: projectExpensesFormSchema.array(),
+  projectsServices: projectServicesFormSchema.array(),
 });
 
 type CreateProjectBodySchema = z.infer<typeof createProjectBodySchema>;
@@ -52,8 +53,8 @@ export class CreateProjectController {
       hoursForecast,
       name,
       startDate,
-      projectExpenses,
-      projectServices,
+      projectsExpenses,
+      projectsServices,
     } = body;
 
     const client = await this.prisma.client.findUnique({
@@ -62,17 +63,17 @@ export class CreateProjectController {
       },
     });
 
-    const newEndDate = endDate || null;
+    const newEndDate = endDate ? parseISO(endDate) : null;
 
     const project = await this.prisma.project.create({
       data: {
-        deliveryForecast,
+        deliveryForecast: parseISO(deliveryForecast),
         endDate: newEndDate,
         hourValue,
         hoursBalance,
         hoursForecast,
         name,
-        startDate,
+        startDate: parseISO(startDate),
         company: {
           connect: { id: client?.companyId },
         },
@@ -85,7 +86,7 @@ export class CreateProjectController {
       },
     });
 
-    projectExpenses.forEach(
+    projectsExpenses.forEach(
       async (expense) =>
         await this.prisma.projectExpenses.create({
           data: {
@@ -102,7 +103,7 @@ export class CreateProjectController {
         }),
     );
 
-    projectServices.forEach(
+    projectsServices.forEach(
       async (service) =>
         await this.prisma.projectService.create({
           data: {

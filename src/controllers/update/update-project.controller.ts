@@ -1,4 +1,5 @@
 import { Body, Controller, HttpCode, Put, UseGuards } from "@nestjs/common";
+import { parseISO } from "date-fns";
 import { CurrentUser } from "src/auth/current-user.decorator";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { UserPayload } from "src/auth/jwt.strategy";
@@ -24,14 +25,14 @@ const updateProjectSchema = z.object({
   clientId: z.string().uuid(),
   coordinatorId: z.string().uuid(),
   name: z.string(),
-  startDate: z.coerce.date(),
-  endDate: z.coerce.date(),
+  startDate: z.string(),
+  endDate: z.string().optional(),
   deliveryForecast: z.string(),
   hoursForecast: z.string(),
-  hoursBalance: z.string(),
+  hoursBalance: z.string().optional(),
   hourValue: z.string(),
-  projectExpenses: projectExpensesFormSchema.array(),
-  projectServices: projectServicesFormSchema.array(),
+  projectsExpenses: projectExpensesFormSchema.array(),
+  projectsServices: projectServicesFormSchema.array(),
 });
 
 type UpdateProjectSchema = z.infer<typeof updateProjectSchema>;
@@ -57,9 +58,11 @@ export class UpdateProjectController {
       name,
       projectId,
       startDate,
-      projectExpenses,
-      projectServices,
+      projectsExpenses,
+      projectsServices,
     } = body;
+
+    const newEndDate = endDate ? parseISO(endDate) : null;
 
     await this.prisma.project.update({
       where: {
@@ -68,13 +71,13 @@ export class UpdateProjectController {
       data: {
         clientId,
         coordinatorId,
-        deliveryForecast,
-        endDate,
+        deliveryForecast: parseISO(deliveryForecast),
+        endDate: newEndDate,
         hourValue,
         hoursBalance,
         hoursForecast,
         name,
-        startDate,
+        startDate: parseISO(startDate),
       },
     });
 
@@ -84,8 +87,8 @@ export class UpdateProjectController {
       },
     });
 
-    if (projectExpenses?.length > 0) {
-      projectExpenses?.map(async (newExpense) => {
+    if (projectsExpenses?.length > 0) {
+      projectsExpenses?.map(async (newExpense) => {
         if (newExpense.id) {
           await this.prisma.projectExpenses.update({
             where: {
@@ -121,8 +124,8 @@ export class UpdateProjectController {
       });
     }
 
-    if (projectServices?.length > 0) {
-      projectServices.map(async (service) => {
+    if (projectsServices?.length > 0) {
+      projectsServices.map(async (service) => {
         if (service.id) {
           await this.prisma.projectService.update({
             where: {
