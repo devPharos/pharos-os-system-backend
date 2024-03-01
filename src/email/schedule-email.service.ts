@@ -32,37 +32,38 @@ export class EmailSchedulerService {
     const collaborators = await this.prisma.collaborator.findMany();
 
     collaborators.forEach(async (collaborator) => {
-      const user = await this.prisma.user.findUnique({
-        where: {
-          id: collaborator?.userId || undefined,
-        },
-        select: {
-          email: true,
-        },
-      });
+      if (collaborator.userId) {
+        const user = await this.prisma.user.findUnique({
+          where: {
+            id: collaborator.userId,
+          },
+          select: {
+            email: true,
+          },
+        });
 
-      const scheduledDate = new Date(
-        getYear(new Date()),
-        getMonth(new Date()),
-        today,
-        8,
-        0,
-        0,
-      );
+        const scheduledDate = new Date(
+          getYear(new Date()),
+          getMonth(new Date()),
+          today,
+          8,
+          0,
+          0,
+        );
 
-      if (user) {
         const clientsNames = filteredClients
           .map((client) => {
             return client.fantasyName;
           })
           .join(",");
 
-        schedule.scheduleJob(scheduledDate, async () => {
-          try {
-            await this.emailService.send(
-              user?.email,
-              "Data limite de lançamento das OS",
-              `
+        if (user) {
+          schedule.scheduleJob(scheduledDate, async () => {
+            try {
+              await this.emailService.send(
+                user?.email,
+                "Data limite de lançamento das OS",
+                `
                  <table style="margin: 0 auto; width: 100%;">
                    <tr>
                      <td align="center" valign="top" style="padding-bottom:24px;">
@@ -108,11 +109,12 @@ export class EmailSchedulerService {
                    </tr>
                  </table>
               `,
-            );
-          } catch (error) {
-            console.error("Erro ao enviar email:", error);
-          }
-        });
+              );
+            } catch (error) {
+              console.error("Erro ao enviar email:", error);
+            }
+          });
+        }
       }
     });
   }

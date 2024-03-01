@@ -61,6 +61,7 @@ import { ListClosingController } from "./controllers/list/list-closing.controlle
 import { UpdateClosingStatusController } from "./controllers/update/update-closing-status.controller";
 import { StorageModule } from "./storage/storage.module";
 import { EmailModule } from "./email/email.module";
+import { UpdateProjectStatusController } from "./controllers/update/update-project-status";
 
 @Module({
   imports: [
@@ -74,6 +75,7 @@ import { EmailModule } from "./email/email.module";
     EmailModule,
   ],
   controllers: [
+    UpdateProjectStatusController,
     UpdateClosingStatusController,
     AuthenticateUserController,
     CreateClientController,

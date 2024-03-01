@@ -105,7 +105,7 @@ export class ListServiceOrdersController {
       const month = getMonth(new Date(date)) + 1;
       const year = getYear(new Date(date));
 
-      const serviceOrders = await this.prisma.serviceOrder.findMany({
+      const myServiceOrders = await this.prisma.serviceOrder.findMany({
         where: {
           collaboratorId: collaborator?.id,
           AND: [
@@ -169,12 +169,7 @@ export class ListServiceOrdersController {
           },
           select: {
             id: true,
-            client: {
-              select: {
-                fantasyName: true,
-                cnpj: true,
-              },
-            },
+            clientId: true,
             status: true,
             startDate: true,
             endDate: true,
@@ -187,12 +182,19 @@ export class ListServiceOrdersController {
                 id: true,
               },
             },
+            client: {
+              select: {
+                fantasyName: true,
+                cnpj: true,
+              },
+            },
           },
         });
 
+      const serviceOrders = myServiceOrders.concat(serviceOrdersSupervisedByMe);
+
       return {
         serviceOrders,
-        serviceOrdersSupervisedByMe,
         defaultDate,
         date: defaultDate.date,
         formattedDate: defaultDate.formattedDate,

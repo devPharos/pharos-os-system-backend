@@ -1,5 +1,6 @@
 import { Controller, Get, HttpCode, UseGuards } from "@nestjs/common";
 import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { CurrentUser } from "src/auth/current-user.decorator";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { UserPayload } from "src/auth/jwt.strategy";
@@ -51,7 +52,10 @@ export class ListServiceOrdersFiltersController {
     }[] = [];
 
     serviceOrders.forEach((os: any) => {
-      const formattedDate = format(os.startDate, "MMMM - yyyy");
+      const newDate = format(os.startDate, "MMMM - yyyy", {
+        locale: ptBR,
+      });
+      const formattedDate = newDate.charAt(0).toUpperCase() + newDate.slice(1);
       const dateAlreadyExists = dates.find(
         (date) => date.formattedDate === formattedDate,
       );

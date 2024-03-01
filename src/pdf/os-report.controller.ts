@@ -51,14 +51,20 @@ export class OsReportPdfController {
   ): Promise<any> {
     const { clientId, collaboratorId, endDate, projectId, startDate } = body;
 
+    console.log(body);
+
     const serviceOrders = await this.prisma.serviceOrder.findMany({
       where: {
         OR: [
           {
             clientId: clientId || undefined,
+          },
+          {
             collaboratorId: {
               equals: collaboratorId || undefined,
             },
+          },
+          {
             serviceOrderDetails: {
               every: {
                 projectId: {
@@ -66,10 +72,14 @@ export class OsReportPdfController {
                 },
               },
             },
+          },
+          {
             startDate: {
               gte: startDate ? parseISO(startDate) : undefined,
               lte: endDate ? parseISO(endDate) : undefined,
             },
+          },
+          {
             endDate: {
               gte: startDate ? parseISO(startDate) : undefined,
               lte: endDate ? parseISO(endDate) : undefined,
