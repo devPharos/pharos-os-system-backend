@@ -21,7 +21,7 @@ interface Project {
   endDate: Date | null;
   hourValue: string;
   hoursBalance: string | null;
-  hoursForecast: string;
+  hoursForecast: string | null;
   name: string;
   serviceOrderDetails: { serviceOrder: { totalHours: string } }[];
   startDate: Date;

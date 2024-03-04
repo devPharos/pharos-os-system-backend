@@ -24,7 +24,7 @@ const createProjectBodySchema = z.object({
   startDate: z.string(),
   endDate: z.string().optional(),
   deliveryForecast: z.string(),
-  hoursForecast: z.string(),
+  hoursForecast: z.string().optional(),
   hoursBalance: z.string().optional(),
   hourValue: z.string(),
   projectsExpenses: projectExpensesFormSchema.array(),
