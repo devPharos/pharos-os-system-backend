@@ -62,6 +62,7 @@ import { UpdateClosingStatusController } from "./controllers/update/update-closi
 import { StorageModule } from "./storage/storage.module";
 import { EmailModule } from "./email/email.module";
 import { UpdateProjectStatusController } from "./controllers/update/update-project-status";
+import { ProjectHoursModule } from "./project-hours/project-hours.module";
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { UpdateProjectStatusController } from "./controllers/update/update-proje
     PdfModule,
     StorageModule,
     EmailModule,
+    ProjectHoursModule,
   ],
   controllers: [
     UpdateProjectStatusController,

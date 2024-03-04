@@ -13,6 +13,51 @@ export class ListServiceOrdersFiltersController {
   @Get("/service-orders/filters")
   @HttpCode(201)
   async handle(@CurrentUser() user: UserPayload) {
+    const currentUser = await this.prisma.user.findUnique({
+      where: {
+        id: user.sub,
+      },
+    });
+
+    if (currentUser?.groupId === 1) {
+      const serviceOrders = await this.prisma.serviceOrder.findMany({
+        select: {
+          startDate: true,
+          endDate: true,
+        },
+      });
+
+      const dates: {
+        formattedDate: string;
+        date: string;
+      }[] = [];
+
+      serviceOrders.forEach((os: any) => {
+        const newDate = format(os.startDate, "MMMM - yyyy", {
+          locale: ptBR,
+        });
+        const formattedDate =
+          newDate.charAt(0).toUpperCase() + newDate.slice(1);
+        const dateAlreadyExists = dates.find(
+          (date) => date.formattedDate === formattedDate,
+        );
+
+        if (!dateAlreadyExists) {
+          dates.push({
+            formattedDate,
+            date: os.startDate.toISOString(),
+          });
+        }
+      });
+
+      return dates.sort((a, b) => {
+        const dataA = new Date(a.formattedDate).getTime();
+        const dataB = new Date(b.formattedDate).getTime();
+
+        return dataA - dataB;
+      });
+    }
+
     const collaborator = await this.prisma.collaborator.findUnique({
       where: {
         userId: user.sub,

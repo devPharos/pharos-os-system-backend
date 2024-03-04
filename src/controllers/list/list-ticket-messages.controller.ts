@@ -54,7 +54,7 @@ export class ListSupportTicketsMessagesController {
             fantasyName: true,
           },
         },
-        SupportMessage: {
+        supportMessages: {
           select: {
             id: true,
             message: true,
