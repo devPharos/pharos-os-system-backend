@@ -16,6 +16,9 @@ const updateClientBodySchema = z.object({
   number: z.string(),
   complement: z.string(),
   cep: z.string(),
+  paymentDate: z.string().optional(),
+  paymentWeekDate: z.string().optional(),
+  daysAfterClosing: z.string().optional(),
 });
 
 type UpdateClientBodySchema = z.infer<typeof updateClientBodySchema>;
@@ -40,6 +43,9 @@ export class UpdateClientController {
       number,
       phone,
       state,
+      daysAfterClosing,
+      paymentDate,
+      paymentWeekDate,
     } = body;
 
     await this.prisma.client.update({
@@ -56,6 +62,9 @@ export class UpdateClientController {
         number,
         phone,
         state,
+        daysAfterClosing,
+        paymentDate,
+        paymentWeekDate,
       },
     });
   }

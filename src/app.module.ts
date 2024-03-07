@@ -63,6 +63,7 @@ import { StorageModule } from "./storage/storage.module";
 import { EmailModule } from "./email/email.module";
 import { UpdateProjectStatusController } from "./controllers/update/update-project-status";
 import { ProjectHoursModule } from "./project-hours/project-hours.module";
+import { UpdateClientPaymentDateStatusController } from "./controllers/update/update-client-payment-date.controller";
 
 @Module({
   imports: [
@@ -77,6 +78,7 @@ import { ProjectHoursModule } from "./project-hours/project-hours.module";
     ProjectHoursModule,
   ],
   controllers: [
+    UpdateClientPaymentDateStatusController,
     UpdateProjectStatusController,
     UpdateClosingStatusController,
     AuthenticateUserController,
