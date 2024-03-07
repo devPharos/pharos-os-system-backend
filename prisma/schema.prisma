@@ -118,29 +118,31 @@ model Collaborator {
 }
 
 model Client {
-  id             String         @id @default(uuid())
-  companyId      String         @map("company_id")
-  userId         String?        @unique @map("user_id")
-  businessName   String         @map("business_id")
-  fantasyName    String         @map("fantasy_id")
-  cnpj           String         @unique
-  phone          String
-  country        String
-  state          String
-  city           String
-  neighborhood   String
-  address        String
-  number         String
-  complement     String?
-  cep            String
-  paymentDate    String?        @db.VarChar(2)
-  active         Boolean?       @default(true)
-  company        Company        @relation(fields: [companyId], references: [id])
-  user           User?          @relation(fields: [userId], references: [id])
-  projects       Project[]
-  servicesOrders ServiceOrder[]
-  supports       Support[]
-  closings       Closing[]
+  id               String         @id @default(uuid())
+  companyId        String         @map("company_id")
+  userId           String?        @unique @map("user_id")
+  businessName     String         @map("business_id")
+  fantasyName      String         @map("fantasy_id")
+  cnpj             String         @unique
+  phone            String
+  country          String
+  state            String
+  city             String
+  neighborhood     String
+  address          String
+  number           String
+  complement       String?
+  cep              String
+  paymentDate      String?        @db.VarChar(2)
+  paymentWeekDate  String?
+  daysAfterClosing String?
+  active           Boolean?       @default(true)
+  company          Company        @relation(fields: [companyId], references: [id])
+  user             User?          @relation(fields: [userId], references: [id])
+  projects         Project[]
+  servicesOrders   ServiceOrder[]
+  supports         Support[]
+  closings         Closing[]
 
   @@index([companyId], map: "clients_company_id_fkey")
   @@map("clients")

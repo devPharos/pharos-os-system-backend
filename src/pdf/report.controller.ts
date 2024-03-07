@@ -293,7 +293,10 @@ export class ReportPdfController {
           projectHourValue,
         );
 
-        return pdfPath;
+        return {
+          ...pdfPath,
+          projectId,
+        };
       }),
     ).then((values) => {
       return values;

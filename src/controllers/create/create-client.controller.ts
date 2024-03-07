@@ -25,7 +25,9 @@ const createClientBodySchema = z.object({
   number: z.string(),
   complement: z.string().optional(),
   cep: z.string(),
-  paymentDate: z.string(),
+  paymentDate: z.string().optional(),
+  paymentWeekDate: z.string().optional(),
+  daysAfterClosing: z.string().optional(),
 });
 
 type CreateClientBodySchema = z.infer<typeof createClientBodySchema>;
@@ -54,6 +56,8 @@ export class CreateClientController {
       phone,
       state,
       paymentDate,
+      daysAfterClosing,
+      paymentWeekDate,
     } = body;
 
     const existentClient = await this.prisma.client.findUnique({
@@ -91,6 +95,8 @@ export class CreateClientController {
         phone,
         state,
         paymentDate,
+        daysAfterClosing,
+        paymentWeekDate,
         company: {
           connect: { id: currentCompany?.id },
         },
