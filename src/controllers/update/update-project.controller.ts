@@ -27,8 +27,8 @@ const updateProjectSchema = z.object({
   name: z.string(),
   startDate: z.string(),
   endDate: z.string().optional(),
-  deliveryForecast: z.string(),
-  hoursForecast: z.string(),
+  deliveryForecast: z.string().optional(),
+  hoursForecast: z.string().optional(),
   hoursBalance: z.string().optional(),
   hourValue: z.string(),
   projectsExpenses: projectExpensesFormSchema.array(),
@@ -63,6 +63,9 @@ export class UpdateProjectController {
     } = body;
 
     const newEndDate = endDate ? parseISO(endDate) : null;
+    const newDeliveryForecast = deliveryForecast
+      ? parseISO(deliveryForecast)
+      : null;
 
     await this.prisma.project.update({
       where: {
@@ -71,7 +74,7 @@ export class UpdateProjectController {
       data: {
         clientId,
         coordinatorId,
-        deliveryForecast: parseISO(deliveryForecast),
+        deliveryForecast: newDeliveryForecast,
         endDate: newEndDate,
         hourValue,
         hoursBalance,

@@ -23,7 +23,7 @@ const createProjectBodySchema = z.object({
   name: z.string(),
   startDate: z.string(),
   endDate: z.string().optional(),
-  deliveryForecast: z.string(),
+  deliveryForecast: z.string().optional(),
   hoursForecast: z.string().optional(),
   hoursBalance: z.string().optional(),
   hourValue: z.string(),
@@ -64,10 +64,13 @@ export class CreateProjectController {
     });
 
     const newEndDate = endDate ? parseISO(endDate) : null;
+    const newDeliveryForecast = deliveryForecast
+      ? parseISO(deliveryForecast)
+      : null;
 
     const project = await this.prisma.project.create({
       data: {
-        deliveryForecast: parseISO(deliveryForecast),
+        deliveryForecast: newDeliveryForecast,
         endDate: newEndDate,
         hourValue,
         hoursBalance,

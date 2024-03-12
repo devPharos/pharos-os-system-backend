@@ -156,7 +156,7 @@ model Project {
   name                 String
   startDate            DateTime               @map("start_date")
   endDate              DateTime?              @map("end_date")
-  deliveryForecast     DateTime               @map("delivery_forecast")
+  deliveryForecast     DateTime?              @map("delivery_forecast")
   hoursForecast        String?                @map("hours_forecast")
   hoursBalance         String?                @map("hours_balance")
   hourValue            String                 @map("hour_value")
