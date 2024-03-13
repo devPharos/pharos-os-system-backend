@@ -78,7 +78,9 @@ export class FindProjectController {
     return {
       ...project,
       startDate: format(project.startDate, "yyyy-MM-dd"),
-      deliveryForecast: format(project.deliveryForecast, "yyyy-MM-dd"),
+      deliveryForecast: project?.deliveryForecast
+        ? format(project?.deliveryForecast || 0, "yyyy-MM-dd")
+        : null,
       endDate: project?.endDate
         ? format(project?.endDate || 0, "yyyy-MM-dd")
         : null,

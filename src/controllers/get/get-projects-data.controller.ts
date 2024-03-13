@@ -17,7 +17,7 @@ interface Project {
   };
   companyId: string;
   coordinatorId: string;
-  deliveryForecast: Date;
+  deliveryForecast: Date | null;
   endDate: Date | null;
   hourValue: string;
   hoursBalance: string | null;
