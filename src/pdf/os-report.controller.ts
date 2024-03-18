@@ -51,8 +51,6 @@ export class OsReportPdfController {
   ): Promise<any> {
     const { clientId, collaboratorId, endDate, projectId, startDate } = body;
 
-    console.log(body);
-
     const serviceOrders = await this.prisma.serviceOrder.findMany({
       where: {
         OR: [

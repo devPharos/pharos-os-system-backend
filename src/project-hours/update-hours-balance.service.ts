@@ -64,8 +64,6 @@ export class ProjectUsedHoursService {
         projectUsedHours += parseInt(os.totalHours);
       });
 
-      console.log(projectUsedHours);
-
       const hoursBalance = (
         (project.hoursBalance ? parseInt(project.hoursBalance) : 0) +
         projectUsedHours

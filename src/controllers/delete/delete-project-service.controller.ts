@@ -25,17 +25,6 @@ export class DeleteServiceController {
   async handle(@Headers() header: DeleteServiceHeaderSchema) {
     const { serviceid, projectid } = header;
 
-    console.log(serviceid);
-    console.log(projectid);
-
-    const service = await this.prisma.projectService.findUnique({
-      where: {
-        id: serviceid,
-      },
-    });
-
-    console.log(service);
-
     await this.prisma.projectService.delete({
       where: { id: serviceid },
     });
