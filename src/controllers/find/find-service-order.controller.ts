@@ -10,6 +10,10 @@ import { format } from "date-fns";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { PrismaService } from "src/prisma/prisma.service";
 import { z } from "zod";
+import {
+  ServiceOrderDetails,
+  ServiceOrderExpenses,
+} from "../create/create-service-order.controller";
 
 const findServiceOrderSchema = z.object({
   id: z.string().uuid(),
@@ -45,14 +49,8 @@ export class FindServiceOrderController {
           select: {
             id: true,
             projectId: true,
-            projectExpenses: {
-              select: {
-                id: true,
-                requireReceipt: true,
-                value: true,
-                description: true,
-              },
-            },
+            value: true,
+            projectExpenseId: true,
           },
           where: {
             serviceOrderId: id,
@@ -61,26 +59,8 @@ export class FindServiceOrderController {
         serviceOrderDetails: {
           select: {
             id: true,
-            project: {
-              select: {
-                id: true,
-                name: true,
-                projectsExpenses: {
-                  select: {
-                    id: true,
-                    requireReceipt: true,
-                    value: true,
-                    description: true,
-                  },
-                },
-              },
-            },
-            projectServices: {
-              select: {
-                id: true,
-                description: true,
-              },
-            },
+            projectServiceId: true,
+            projectId: true,
             startDate: true,
             endDate: true,
             description: true,
@@ -96,11 +76,70 @@ export class FindServiceOrderController {
       throw new NotFoundException("Service order not found.");
     }
 
+    const details: ServiceOrderDetails[] = [];
+
+    for (const detail of serviceOrder.serviceOrderDetails) {
+      const expenses: ServiceOrderExpenses[] = [];
+
+      const project = await this.prisma.project.findUnique({
+        where: {
+          id: detail.projectId,
+        },
+        select: {
+          name: true,
+          projectsServices: {
+            select: {
+              description: true,
+            },
+            where: {
+              id: detail.projectServiceId,
+            },
+          },
+        },
+      });
+
+      for (const expense of serviceOrder.serviceOrderExpenses) {
+        const projectExpense = await this.prisma.projectExpenses.findUnique({
+          where: {
+            id: expense.projectExpenseId,
+          },
+          select: {
+            id: true,
+          },
+        });
+        if (expense.projectId === detail.projectId) {
+          const newExpense: ServiceOrderExpenses = {
+            value: expense.value,
+            projectExpenseId: projectExpense?.id ?? "",
+          };
+
+          expenses.push(newExpense);
+        }
+      }
+
+      const newDetail: ServiceOrderDetails = {
+        description: detail.description,
+        endDate: format(detail.endDate, "HH:mm"),
+        startDate: format(detail.startDate, "HH:mm"),
+        projectServiceId: detail.projectServiceId,
+        projectId: detail.projectId,
+        project: {
+          name: project?.name ?? "",
+          service: {
+            description: project?.projectsServices[0].description ?? "",
+          },
+        },
+        expenses,
+      };
+
+      details.push(newDetail);
+    }
+
     return {
-      ...serviceOrder,
-      fantasyName: serviceOrder.client.fantasyName,
-      cnpj: serviceOrder.client.cnpj,
+      clientId: serviceOrder.clientId,
+      serviceType: serviceOrder.remote ? "Remoto" : "Presencial",
       date: format(serviceOrder.date, "yyyy-MM-dd"),
+      details,
     };
   }
 }

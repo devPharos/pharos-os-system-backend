@@ -17,6 +17,7 @@ export class GetProjectServicesController {
   @HttpCode(201)
   async handle(@Headers() headers: GetProjectsBodySchema) {
     const { projectid } = headers;
+    console.log(projectid);
     const projectsServices = await this.prisma.projectService.findMany({
       where: {
         projectId: projectid,

@@ -181,7 +181,9 @@ export class ReportPdfController {
 
           hoursToBeBilled += Number(serviceOrder?.totalHours);
           totalValue += Number(
-            Number(serviceOrder?.totalHours) * Number(project?.hourValue),
+            (Number(serviceOrder?.totalHours) *
+              Number(project?.hourValue.replace(/\D/g, ""))) /
+              100,
           );
         });
 
