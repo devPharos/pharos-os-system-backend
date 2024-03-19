@@ -23,7 +23,16 @@ export class ListSupervisorsController {
 
     const supervisors = await this.prisma.collaborator.findMany({
       where: {
-        companyId: company?.companyId,
+        AND: [
+          {
+            companyId: company?.companyId,
+          },
+          {
+            userId: {
+              not: user.sub,
+            },
+          },
+        ],
       },
       select: {
         id: true,
