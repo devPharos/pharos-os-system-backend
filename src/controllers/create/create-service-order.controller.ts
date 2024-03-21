@@ -79,8 +79,6 @@ export class CreateServiceOrderController {
       },
     });
 
-    console.log(body);
-
     const startDate = details.sort((a, b) => {
       return (
         parse(a.startDate, "HH:mm", parseISO(date)).getTime() -
