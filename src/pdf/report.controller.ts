@@ -144,7 +144,7 @@ export class ReportPdfController {
               style: "currency",
               currency: "BRL",
             }),
-            paymentDate: client.paymentDate ?? "",
+            paymentDate: client.paymentDate ?? null,
             taxTotalValue: totalTaxes.toLocaleString("pt-BR", {
               style: "currency",
               currency: "BRL",
@@ -298,9 +298,9 @@ export class ReportPdfController {
         encoding: "base64",
       });
 
-      // doc.image("src/assets/logo-yellow.png", 50, undefined, {
-      //   align: "center",
-      // });
+      doc.image("src/assets/logo-yellow.png", 50, undefined, {
+        align: "center",
+      });
 
       doc
         .font("Helvetica")
@@ -347,9 +347,6 @@ export class ReportPdfController {
     endDate: string,
     project: Project,
   ): Promise<boolean> {
-    console.log(startDate);
-    console.log(endDate);
-    console.log(project);
     const projectServiceOrdersInThisPeriod =
       await this.prisma.serviceOrder.findMany({
         where: {
