@@ -69,6 +69,7 @@ export class ReportPdfController {
         });
 
         if (!project) {
+          return "Projeto nao encontrado";
           throw new NotFoundException("Projeto não encontrado");
         }
 
@@ -79,6 +80,7 @@ export class ReportPdfController {
         );
 
         if (!isAValidProject) {
+          return "Invalid project";
           throw new NotAcceptableException(
             "Existem OS's não validadas nesse período!",
           );
@@ -98,6 +100,7 @@ export class ReportPdfController {
           });
 
           if (!serviceOrder) {
+            return "OS não encontrada";
             throw new NotFoundException("Ordem de serviço não encontrada");
           }
           const totalHours = parseFloat(serviceOrder?.totalHours);
@@ -125,6 +128,7 @@ export class ReportPdfController {
         });
 
         if (!client) {
+          return "Cliente nao encontrada";
           throw new NotFoundException("Cliente não encontrado");
         }
 
