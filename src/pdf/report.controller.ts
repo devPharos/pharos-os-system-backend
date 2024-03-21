@@ -144,7 +144,7 @@ export class ReportPdfController {
               style: "currency",
               currency: "BRL",
             }),
-            paymentDate: client.paymentDate === "" ? null : client.paymentDate,
+            paymentDate: client.paymentDate,
             taxTotalValue: totalTaxes.toLocaleString("pt-BR", {
               style: "currency",
               currency: "BRL",

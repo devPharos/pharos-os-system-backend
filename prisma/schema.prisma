@@ -133,7 +133,7 @@ model Client {
   number           String
   complement       String?
   cep              String
-  paymentDate      String?        @db.VarChar(2)
+  paymentDate      String?        @default("")
   paymentWeekDate  String?
   daysAfterClosing String?
   active           Boolean?       @default(true)
@@ -310,7 +310,7 @@ model Closing {
   expensesTotalValue  String
   taxTotalValue       String
   status              ClosingStatus @default(Aberto)
-  paymentDate         String?       @db.VarChar(2)
+  paymentDate         String?       @default("")
   startDate           DateTime
   endDate             DateTime
   createdAt           DateTime      @default(now())
