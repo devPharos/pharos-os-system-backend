@@ -50,7 +50,6 @@ export class UpdateClientPaymentDateStatusController {
     });
 
     if (client) {
-      console.log(client);
       if (client.daysAfterClosing && client.daysAfterClosing !== "") {
         const daysAfterClosing = parseInt(client.daysAfterClosing);
         const newDate = new Date();
@@ -109,18 +108,16 @@ export class UpdateClientPaymentDateStatusController {
           }
         }
 
-        console.log(client.daysAfterClosing);
+        const newPaymentDate = dateToClosing.getDate();
 
-        // const newPaymentDate = dateToClosing.getDate();
-
-        // await this.prisma.client.update({
-        //   data: {
-        //     paymentDate: newPaymentDate.toString(),
-        //   },
-        //   where: {
-        //     id: client.id,
-        //   },
-        // });
+        await this.prisma.client.update({
+          data: {
+            paymentDate: newPaymentDate.toString(),
+          },
+          where: {
+            id: client.id,
+          },
+        });
       }
     }
   }

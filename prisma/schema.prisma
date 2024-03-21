@@ -310,7 +310,7 @@ model Closing {
   expensesTotalValue  String
   taxTotalValue       String
   status              ClosingStatus @default(Aberto)
-  paymentDate         String        @db.VarChar(2)
+  paymentDate         String?       @db.VarChar(2)
   startDate           DateTime
   endDate             DateTime
   createdAt           DateTime      @default(now())
