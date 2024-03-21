@@ -79,6 +79,8 @@ export class CreateServiceOrderController {
       },
     });
 
+    console.log(body);
+
     const startDate = details.sort((a, b) => {
       return (
         parse(a.startDate, "HH:mm", parseISO(date)).getTime() -
@@ -127,11 +129,17 @@ export class CreateServiceOrderController {
     if (serviceOrderWithSameHour.length !== 0) {
       throw new ConflictException("Ja existe uma OS nesse horário");
     }
+    const newEndDate = parse(endDate, "HH:mm", parseISO(date));
+    const newStartDate = parse(startDate, "HH:mm", parseISO(date));
 
     const serviceOrder = await this.prisma.serviceOrder.create({
       data: {
-        endDate: parse(endDate, "HH:mm", parseISO(date)),
-        startDate: parse(startDate, "HH:mm", parseISO(date)),
+        endDate: new Date(
+          newEndDate.valueOf() + newEndDate.getTimezoneOffset() * 60 * 1000,
+        ),
+        startDate: new Date(
+          newStartDate.valueOf() + newStartDate.getTimezoneOffset() * 60 * 1000,
+        ),
         status,
         totalHours,
         clientId,
@@ -141,8 +149,6 @@ export class CreateServiceOrderController {
         remote: serviceType !== "Presencial",
       },
     });
-
-    console.log(serviceOrder);
 
     details.map(async (detail) => {
       await this.prisma.serviceOrderDetails.create({
