@@ -151,6 +151,7 @@ export class ReportPdfController {
               style: "currency",
               currency: "BRL",
             }),
+            paymentDate: client.paymentDate ?? "",
           },
         });
 
