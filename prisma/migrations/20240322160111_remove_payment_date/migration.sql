@@ -5,4 +5,4 @@
 
 */
 -- AlterTable
-ALTER TABLE `closing` DROP COLUMN `paymentDate`;
+ALTER TABLE `Closing` DROP COLUMN `paymentDate`;

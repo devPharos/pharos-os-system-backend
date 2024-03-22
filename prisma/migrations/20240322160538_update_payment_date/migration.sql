@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE `closing` ALTER COLUMN `paymentDate` DROP DEFAULT;
+ALTER TABLE `Closing` ALTER COLUMN `paymentDate` DROP DEFAULT;
