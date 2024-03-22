@@ -310,7 +310,7 @@ model Closing {
   expensesTotalValue  String
   taxTotalValue       String
   status              ClosingStatus @default(Aberto)
-  paymentDate         String?       @default("")
+  paymentDate         String?
   startDate           DateTime
   endDate             DateTime
   createdAt           DateTime      @default(now())
