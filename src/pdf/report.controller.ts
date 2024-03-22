@@ -19,7 +19,7 @@ import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { PrismaService } from "src/prisma/prisma.service";
 import { z } from "zod";
 import { ServiceOrderProps } from "./pdf.service";
-import { Project } from "@prisma/client";
+import { Closing, Project } from "@prisma/client";
 
 const createMonthlyClosingBodySchema = z.object({
   clientId: z.string().uuid(),
@@ -100,7 +100,6 @@ export class ReportPdfController {
           });
 
           if (!serviceOrder) {
-            return "OS não encontrada";
             throw new NotFoundException("Ordem de serviço não encontrada");
           }
           const totalHours = parseFloat(serviceOrder?.totalHours);
@@ -128,13 +127,12 @@ export class ReportPdfController {
         });
 
         if (!client) {
-          return "Cliente nao encontrada";
           throw new NotFoundException("Cliente não encontrado");
         }
 
         const totalTaxes = parseFloat((totalValue * 0.16).toFixed(2));
 
-        const closing = await this.prisma.closing.create({
+        const closing: Closing = await this.prisma.closing.create({
           data: {
             clientId,
             projectId,

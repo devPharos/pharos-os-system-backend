@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE `Closing` MODIFY `paymentDate` VARCHAR(2) NULL;
+ALTER TABLE `closing` MODIFY `paymentDate` VARCHAR(2) NULL;
