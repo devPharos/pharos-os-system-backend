@@ -103,7 +103,7 @@ project.fragment.lock.json
 artifacts/
 **/Properties/launchSettings.json
 
-temp/
+
 
 *_i.c
 *_p.c
