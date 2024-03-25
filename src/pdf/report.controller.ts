@@ -153,6 +153,12 @@ export class ReportPdfController {
           },
         });
 
+        const newEndDate = add(new Date(endDate), {
+          hours: 23,
+          minutes: 59,
+          seconds: 59,
+        }).toISOString();
+
         await this.prisma.serviceOrder.updateMany({
           where: {
             AND: [
@@ -166,7 +172,7 @@ export class ReportPdfController {
               },
               {
                 endDate: {
-                  lte: parseISO(endDate),
+                  lte: parseISO(newEndDate),
                 },
               },
               {
@@ -183,12 +189,6 @@ export class ReportPdfController {
             status: "Faturado",
           },
         });
-
-        const newEndDate = add(new Date(endDate), {
-          hours: 23,
-          minutes: 59,
-          seconds: 59,
-        }).toISOString();
 
         const serviceOrders = await this.prisma.serviceOrder.findMany({
           where: {
@@ -300,9 +300,14 @@ export class ReportPdfController {
         encoding: "base64",
       });
 
-      // doc.image("src/assets/logo-yellow.png", 50, undefined, {
-      //   align: "center",
-      // });
+      doc.image(
+        `${resolve(__dirname, "..", "..", "src", "assets")}/logo-yellow.png`,
+        50,
+        undefined,
+        {
+          align: "center",
+        },
+      );
 
       doc
         .font("Helvetica")
