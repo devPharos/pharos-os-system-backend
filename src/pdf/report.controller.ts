@@ -10,7 +10,7 @@ import {
   Res,
   UseGuards,
 } from "@nestjs/common";
-import { differenceInHours, format, parseISO } from "date-fns";
+import { differenceInHours, format, parseISO, parse, add } from "date-fns";
 import { Response } from "express";
 import * as fs from "fs";
 import { resolve } from "path";
@@ -190,6 +190,12 @@ export class ReportPdfController {
           },
         });
 
+        const newEndDate = add(new Date(endDate), {
+          hours: 23,
+          minutes: 59,
+          seconds: 59,
+        }).toISOString();
+
         console.log("ordem de serviço", os);
 
         const serviceOrders = await this.prisma.serviceOrder.findMany({
@@ -205,7 +211,7 @@ export class ReportPdfController {
               },
               {
                 endDate: {
-                  lte: parseISO(endDate),
+                  lte: parseISO(newEndDate),
                 },
               },
               {
@@ -353,6 +359,13 @@ export class ReportPdfController {
     endDate: string,
     project: Project,
   ): Promise<boolean> {
+    const newEndDate = add(new Date(endDate), {
+      hours: 23,
+      minutes: 59,
+      seconds: 59,
+    }).toISOString();
+
+    console.log(newEndDate);
     const projectServiceOrdersInThisPeriod =
       await this.prisma.serviceOrder.findMany({
         where: {
@@ -364,7 +377,7 @@ export class ReportPdfController {
             },
             {
               endDate: {
-                lte: parseISO(endDate),
+                lte: parseISO(newEndDate),
               },
             },
             {
@@ -378,10 +391,18 @@ export class ReportPdfController {
         },
       });
 
+    console.log(projectServiceOrdersInThisPeriod);
+
     const areAllOsValidated =
       projectServiceOrdersInThisPeriod.filter((os) => os.status === "Validado")
         .length === projectServiceOrdersInThisPeriod.length;
 
+    console.log(areAllOsValidated);
+    console.log(
+      projectServiceOrdersInThisPeriod.filter((os) => os.status === "Validado")
+        .length,
+    );
+    console.log(projectServiceOrdersInThisPeriod.length);
     return areAllOsValidated;
   }
 
