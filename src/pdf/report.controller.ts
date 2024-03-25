@@ -69,7 +69,7 @@ export class ReportPdfController {
         });
 
         if (!project) {
-          return "Projeto nao encontrado";
+          console.log("projeto 404");
           throw new NotFoundException("Projeto não encontrado");
         }
 
@@ -80,7 +80,7 @@ export class ReportPdfController {
         );
 
         if (!isAValidProject) {
-          return "Invalid project";
+          console.log("projeto");
           throw new NotAcceptableException(
             "Existem OS's não validadas nesse período!",
           );
@@ -100,6 +100,7 @@ export class ReportPdfController {
           });
 
           if (!serviceOrder) {
+            console.log("os");
             throw new NotFoundException("Ordem de serviço não encontrada");
           }
           const totalHours = parseFloat(serviceOrder?.totalHours);
@@ -127,6 +128,7 @@ export class ReportPdfController {
         });
 
         if (!client) {
+          console.log("cliente");
           throw new NotFoundException("Cliente não encontrado");
         }
 
@@ -155,7 +157,9 @@ export class ReportPdfController {
           },
         });
 
-        await this.prisma.serviceOrder.updateMany({
+        console.log("fechamento", closing);
+
+        const os = await this.prisma.serviceOrder.updateMany({
           where: {
             AND: [
               {
@@ -185,6 +189,8 @@ export class ReportPdfController {
             status: "Faturado",
           },
         });
+
+        console.log("ordem de serviço", os);
 
         const serviceOrders = await this.prisma.serviceOrder.findMany({
           where: {
@@ -333,6 +339,8 @@ export class ReportPdfController {
         serviceOrders,
         projectId: project.id,
       };
+
+      console.log("retorno", ret);
 
       return ret;
     } catch (err: any) {
