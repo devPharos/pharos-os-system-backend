@@ -380,7 +380,7 @@ export class ReportPdfController {
 
     const areAllOsValidated =
       projectServiceOrdersInThisPeriod.filter((os) => os.status === "Validado")
-        .length > 0;
+        .length === projectServiceOrdersInThisPeriod.length;
 
     return areAllOsValidated;
   }
