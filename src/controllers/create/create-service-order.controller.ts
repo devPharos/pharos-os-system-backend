@@ -132,12 +132,8 @@ export class CreateServiceOrderController {
 
     const serviceOrder = await this.prisma.serviceOrder.create({
       data: {
-        endDate: new Date(
-          newEndDate.valueOf() + newEndDate.getTimezoneOffset() * 60 * 1000,
-        ),
-        startDate: new Date(
-          newStartDate.valueOf() + newStartDate.getTimezoneOffset() * 60 * 1000,
-        ),
+        endDate: newEndDate,
+        startDate: newStartDate,
         status,
         totalHours,
         clientId,
