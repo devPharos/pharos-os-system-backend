@@ -10,7 +10,7 @@ import {
   Res,
   UseGuards,
 } from "@nestjs/common";
-import { differenceInHours, format, parseISO } from "date-fns";
+import { differenceInHours, format, parseISO, parse, add } from "date-fns";
 import { Response } from "express";
 import * as fs from "fs";
 import { resolve } from "path";
@@ -69,7 +69,6 @@ export class ReportPdfController {
         });
 
         if (!project) {
-          console.log("projeto 404");
           throw new NotFoundException("Projeto não encontrado");
         }
 
@@ -80,7 +79,6 @@ export class ReportPdfController {
         );
 
         if (!isAValidProject) {
-          console.log("projeto");
           throw new NotAcceptableException(
             "Existem OS's não validadas nesse período!",
           );
@@ -100,7 +98,6 @@ export class ReportPdfController {
           });
 
           if (!serviceOrder) {
-            console.log("os");
             throw new NotFoundException("Ordem de serviço não encontrada");
           }
           const totalHours = parseFloat(serviceOrder?.totalHours);
@@ -128,7 +125,6 @@ export class ReportPdfController {
         });
 
         if (!client) {
-          console.log("cliente");
           throw new NotFoundException("Cliente não encontrado");
         }
 
@@ -157,9 +153,13 @@ export class ReportPdfController {
           },
         });
 
-        console.log("fechamento", closing);
+        const newEndDate = add(new Date(endDate), {
+          hours: 23,
+          minutes: 59,
+          seconds: 59,
+        }).toISOString();
 
-        const os = await this.prisma.serviceOrder.updateMany({
+        await this.prisma.serviceOrder.updateMany({
           where: {
             AND: [
               {
@@ -172,7 +172,7 @@ export class ReportPdfController {
               },
               {
                 endDate: {
-                  lte: parseISO(endDate),
+                  lte: parseISO(newEndDate),
                 },
               },
               {
@@ -190,8 +190,6 @@ export class ReportPdfController {
           },
         });
 
-        console.log("ordem de serviço", os);
-
         const serviceOrders = await this.prisma.serviceOrder.findMany({
           where: {
             AND: [
@@ -205,7 +203,7 @@ export class ReportPdfController {
               },
               {
                 endDate: {
-                  lte: parseISO(endDate),
+                  lte: parseISO(newEndDate),
                 },
               },
               {
@@ -302,9 +300,14 @@ export class ReportPdfController {
         encoding: "base64",
       });
 
-      // doc.image("src/assets/logo-yellow.png", 50, undefined, {
-      //   align: "center",
-      // });
+      doc.image(
+        `${resolve(__dirname, "..", "..", "src", "assets")}/logo-yellow.png`,
+        50,
+        undefined,
+        {
+          align: "center",
+        },
+      );
 
       doc
         .font("Helvetica")
@@ -340,8 +343,6 @@ export class ReportPdfController {
         projectId: project.id,
       };
 
-      console.log("retorno", ret);
-
       return ret;
     } catch (err: any) {
       return { error: err.message, status: 400 };
@@ -353,6 +354,12 @@ export class ReportPdfController {
     endDate: string,
     project: Project,
   ): Promise<boolean> {
+    const newEndDate = add(new Date(endDate), {
+      hours: 23,
+      minutes: 59,
+      seconds: 59,
+    }).toISOString();
+
     const projectServiceOrdersInThisPeriod =
       await this.prisma.serviceOrder.findMany({
         where: {
@@ -364,7 +371,7 @@ export class ReportPdfController {
             },
             {
               endDate: {
-                lte: parseISO(endDate),
+                lte: parseISO(newEndDate),
               },
             },
             {
@@ -380,7 +387,7 @@ export class ReportPdfController {
 
     const areAllOsValidated =
       projectServiceOrdersInThisPeriod.filter((os) => os.status === "Validado")
-        .length > 0;
+        .length === projectServiceOrdersInThisPeriod.length;
 
     return areAllOsValidated;
   }
