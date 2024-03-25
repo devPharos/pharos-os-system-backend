@@ -296,9 +296,9 @@ export class ReportPdfController {
         encoding: "base64",
       });
 
-      doc.image("src/assets/logo-yellow.png", 50, undefined, {
-        align: "center",
-      });
+      // doc.image("src/assets/logo-yellow.png", 50, undefined, {
+      //   align: "center",
+      // });
 
       doc
         .font("Helvetica")
