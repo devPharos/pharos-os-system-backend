@@ -26,6 +26,7 @@ export interface ServiceOrderProps {
     endDate?: Date;
     project?: {
       name?: string;
+      hourValue?: string;
     };
   }[];
 }
