@@ -32,6 +32,7 @@ const createCollaboratorBodySchema = z.object({
   account: z.string(),
   accountDigit: z.string().max(1).optional(),
   pixKey: z.string().optional(),
+  value: z.string(),
 });
 
 type CreateCollaboratorBodySchema = z.infer<
@@ -68,6 +69,7 @@ export class CreateCollaboratorController {
       phone,
       pixKey,
       state,
+      value,
     } = body;
 
     const currentUser = await this.prisma.user.findUnique({
@@ -112,6 +114,7 @@ export class CreateCollaboratorController {
           phone,
           pixKey,
           state,
+          value,
           company: {
             connect: {
               id: currentUser?.companyId || "",
