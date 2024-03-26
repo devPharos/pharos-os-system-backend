@@ -51,9 +51,15 @@ export class OsReportPdfController {
   ): Promise<any> {
     const { clientId, collaboratorId, endDate, projectId, startDate } = body;
 
+    const newEndDate = new Date(parseISO(endDate));
+
+    newEndDate.setHours(23);
+    newEndDate.setMinutes(59);
+    newEndDate.setSeconds(59);
+
     const serviceOrders = await this.prisma.serviceOrder.findMany({
       where: {
-        OR: [
+        AND: [
           {
             clientId: clientId || undefined,
           },
@@ -64,7 +70,7 @@ export class OsReportPdfController {
           },
           {
             serviceOrderDetails: {
-              every: {
+              some: {
                 projectId: {
                   equals: projectId || undefined,
                 },
@@ -73,14 +79,12 @@ export class OsReportPdfController {
           },
           {
             startDate: {
-              gte: startDate ? parseISO(startDate) : undefined,
-              lte: endDate ? parseISO(endDate) : undefined,
+              gte: parseISO(startDate),
             },
           },
           {
             endDate: {
-              gte: startDate ? parseISO(startDate) : undefined,
-              lte: endDate ? parseISO(endDate) : undefined,
+              lte: newEndDate.toISOString(),
             },
           },
         ],
@@ -109,6 +113,7 @@ export class OsReportPdfController {
             project: {
               select: {
                 name: true,
+                hourValue: true,
               },
             },
           },
@@ -379,74 +384,96 @@ function createTable(doc: PDFKit.PDFDocument, rows: string[][]) {
 async function manipulateServiceOrders(
   serviceOrders: ServiceOrderProps[],
 ): Promise<string[][]> {
-  const newOsArr: string[][] = [
-    [
-      "Emissão",
-      "Cliente",
-      "Analista",
-      "Hr Inicial",
-      "Hr Final",
-      "Hr Total",
-      "Valor",
-      "Despesas",
-    ],
+  const titles: string[] = [
+    "Emissão",
+    "Cliente",
+    "Analista",
+    "Hr Inicial",
+    "Hr Final",
+    "Hr Total",
+    "Valor",
+    "Despesas",
   ];
 
-  serviceOrders.forEach((os) => {
-    const newArr: string[] = [];
-    const formattedDate = format(os.date, "dd/MM/yy");
-    const formattedStateDate = format(os.startDate, "HH:mm");
-    const formattedEndDate = format(os.endDate, "HH:mm");
-    const totalHours = differenceInHours(os.endDate, os.startDate);
-    const value = totalHours * Number(os.collaborator.value);
+  const rows: string[][] = [titles];
+
+  serviceOrders.forEach((serviceOrder) => {
+    const row: string[] = [];
+    const date = format(serviceOrder.date, "dd/MM/yy");
+    const startDate = format(serviceOrder.startDate, "HH:mm");
+    const endDate = format(serviceOrder.endDate, "HH:mm");
+    const totalHours = differenceInHours(
+      serviceOrder.endDate,
+      serviceOrder.startDate,
+    );
+    const hourValue = parseFloat(
+      serviceOrder.collaborator.value.replace("R$", "").replace(",", "."),
+    );
+    const value = totalHours * hourValue;
     let expenses = 0;
 
-    os.serviceOrderExpenses.forEach((expense) => {
-      expenses += Number(expense.value);
+    serviceOrder.serviceOrderExpenses.forEach((expense) => {
+      const expenseValue = parseFloat(
+        expense.value.replace("R$", "").replace(",", "."),
+      );
+      expenses += expenseValue;
     });
 
-    newArr.push(
-      formattedDate,
-      os.client.fantasyName,
-      os.collaborator.name + " " + os.collaborator.lastName,
-      formattedStateDate,
-      formattedEndDate,
-      `${totalHours.toString()}h`,
-      `R$ ${value.toString()},00`,
-      `R$ ${expenses.toString()},00`,
+    row.push(
+      date,
+      serviceOrder.client.fantasyName,
+      serviceOrder.collaborator.name + " " + serviceOrder.collaborator.lastName,
+      startDate,
+      endDate,
+      `${totalHours}h`,
+      value.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }),
+      expenses.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }),
     );
 
-    newOsArr.push(newArr);
+    rows.push(row);
   });
 
-  const totalArr: string[] = [];
-  let totalValue: number = 0;
-  let totalHours: number = 0;
-  let totalExpenses: number = 0;
+  let totalHours = 0;
+  let totalValue = 0;
+  let totalExpenses = 0;
+  const totalRow: string[] = [];
 
-  for (let i = 1; i < newOsArr.length; i++) {
-    totalArr.splice(0, totalArr.length);
-    const hours = parseInt(newOsArr[i][5].split("h")[0]);
-    const value = newOsArr[i][6].match(/\d+/);
-    const expenses = newOsArr[i][7].match(/\d+/);
-    totalValue += value && value[0] ? parseInt(value[0]) : 0;
-    totalHours += hours;
-    totalExpenses += expenses && expenses[0] ? parseInt(expenses[0]) : 0;
+  rows.forEach((row, index) => {
+    if (index !== 0) {
+      const hours = parseInt(row[5].replace("h", ""));
+      const value = parseFloat(row[6].replace("R$", "").replace(",", "."));
+      const expenses = parseFloat(row[7].replace("R$", "").replace(",", "."));
 
-    totalArr.push(
-      "Total",
-      "",
-      "",
-      "",
-      "",
-      `${totalHours.toString()}h`,
-      `R$ ${totalValue.toString()},00`,
-      `R$ ${totalExpenses.toString()},00`,
-    );
-  }
+      totalHours += hours;
+      totalValue += value;
+      totalExpenses += expenses;
+    }
+  });
 
-  const newOSIndex = newOsArr.length;
-  newOsArr.splice(newOSIndex, 0, totalArr);
+  totalRow.push(
+    "Total",
+    "",
+    "",
+    "",
+    "",
+    `${totalHours}h`,
+    totalValue.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }),
+    totalExpenses.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }),
+  );
 
-  return newOsArr;
+  rows.push(totalRow);
+
+  return rows;
 }
