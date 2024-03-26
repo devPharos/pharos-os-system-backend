@@ -23,6 +23,7 @@ const updateCollaboratorBodySchema = z.object({
   account: z.string(),
   accountDigit: z.string().max(1).optional(),
   pixKey: z.string().optional(),
+  value: z.string(),
 });
 
 type UpdateCollaboratorBodySchema = z.infer<
@@ -55,6 +56,7 @@ export class UpdateCollaboratorController {
       number,
       phone,
       pixKey,
+      value,
       state,
     } = body;
 
@@ -78,6 +80,7 @@ export class UpdateCollaboratorController {
         phone,
         pixKey,
         state,
+        value,
         supervisorId: supervisorId || null,
       },
     });
