@@ -112,8 +112,28 @@ export class ListServiceOrdersController {
           },
         });
 
+        type ServiceOrder = (typeof allServiceOrders)[0];
+        type ServiceOrderList = {
+          date: string;
+          endDate: string;
+          startDate: string;
+        } & Omit<ServiceOrder, "endDate" | "startDate" | "date">;
+
+        const newAllServiceOrders: ServiceOrderList[] = [];
+
+        for (const serviceOrder of allServiceOrders) {
+          const newServiceOrder: ServiceOrderList = {
+            ...serviceOrder,
+            date: format(serviceOrder.date, "yyyy-MM-dd"),
+            endDate: format(serviceOrder.endDate, "HH:mm"),
+            startDate: format(serviceOrder.startDate, "HH:mm"),
+          };
+
+          newAllServiceOrders.push(newServiceOrder);
+        }
+
         return {
-          serviceOrders: allServiceOrders,
+          serviceOrders: newAllServiceOrders,
           defaultDate,
           date: defaultDate.date,
           formattedDate: defaultDate.formattedDate,
@@ -288,7 +308,41 @@ export class ListServiceOrdersController {
           },
         });
 
-      const serviceOrders = myServiceOrders.concat(serviceOrdersSupervisedByMe);
+      type ServiceOrder = (typeof myServiceOrders)[0];
+      type ServiceOrderList = {
+        date: string;
+        endDate: string;
+        startDate: string;
+      } & Omit<ServiceOrder, "endDate" | "startDate" | "date">;
+
+      const newServiceOrders: ServiceOrderList[] = [];
+      const newServiceOrdersSupervisedByMe: ServiceOrderList[] = [];
+
+      for (const serviceOrder of myServiceOrders) {
+        const newServiceOrder: ServiceOrderList = {
+          ...serviceOrder,
+          date: format(serviceOrder.date, "yyyy-MM-dd"),
+          endDate: format(serviceOrder.endDate, "HH:mm"),
+          startDate: format(serviceOrder.startDate, "HH:mm"),
+        };
+
+        newServiceOrders.push(newServiceOrder);
+      }
+
+      for (const serviceOrder of serviceOrdersSupervisedByMe) {
+        const newServiceOrder: ServiceOrderList = {
+          ...serviceOrder,
+          date: format(serviceOrder.date, "dd-MM-yyyy"),
+          endDate: format(serviceOrder.endDate, "HH:mm"),
+          startDate: format(serviceOrder.startDate, "HH:mm"),
+        };
+
+        newServiceOrdersSupervisedByMe.push(newServiceOrder);
+      }
+
+      const serviceOrders = newServiceOrders.concat(
+        newServiceOrdersSupervisedByMe,
+      );
 
       return {
         serviceOrders,
