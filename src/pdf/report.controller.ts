@@ -182,6 +182,9 @@ export class ReportPdfController {
                   },
                 },
               },
+              {
+                status: "Validado",
+              },
             ],
           },
           data: {
@@ -212,6 +215,9 @@ export class ReportPdfController {
                     projectId: project.id,
                   },
                 },
+              },
+              {
+                status: "Validado",
               },
             ],
           },
@@ -387,7 +393,7 @@ export class ReportPdfController {
 
     const areAllOsValidated =
       projectServiceOrdersInThisPeriod.filter((os) => os.status === "Validado")
-        .length === projectServiceOrdersInThisPeriod.length;
+        .length >= 1;
 
     return areAllOsValidated;
   }
@@ -467,25 +473,25 @@ export class ReportPdfController {
         totalHours += hours;
         totalValue += value;
         totalExpenses += expenses;
-
-        totalRow.push(
-          "Total Atendimentos:",
-          "",
-          "",
-          "",
-          "",
-          `${totalHours}h`,
-          totalValue.toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-          }),
-          totalExpenses.toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-          }),
-        );
       }
     });
+
+    totalRow.push(
+      "Total Atendimentos:",
+      "",
+      "",
+      "",
+      "",
+      `${totalHours}h`,
+      totalValue.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }),
+      totalExpenses.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }),
+    );
 
     rows.push(totalRow);
 

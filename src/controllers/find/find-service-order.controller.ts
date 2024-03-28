@@ -21,6 +21,14 @@ const findServiceOrderSchema = z.object({
 
 type FindServiceOrderSchema = z.infer<typeof findServiceOrderSchema>;
 
+interface OsFoundedExpenses extends ServiceOrderExpenses {
+  id: string;
+}
+
+interface OsFoundedDetails extends ServiceOrderDetails {
+  id: string;
+}
+
 @Controller("/find")
 @UseGuards(JwtAuthGuard)
 export class FindServiceOrderController {
@@ -108,7 +116,8 @@ export class FindServiceOrderController {
           },
         });
         if (expense.projectId === detail.projectId) {
-          const newExpense: ServiceOrderExpenses = {
+          const newExpense: OsFoundedExpenses = {
+            id: expense.id,
             value: expense.value,
             projectExpenseId: projectExpense?.id ?? "",
           };
@@ -117,7 +126,8 @@ export class FindServiceOrderController {
         }
       }
 
-      const newDetail: ServiceOrderDetails = {
+      const newDetail: OsFoundedDetails = {
+        id: detail.id,
         description: detail.description,
         endDate: format(detail.endDate, "HH:mm"),
         startDate: format(detail.startDate, "HH:mm"),
